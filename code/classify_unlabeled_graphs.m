@@ -34,29 +34,30 @@ if alg.truth_start == false     % if not starting at the truth, generate permuat
     end
 end
 
-if strcmp(alg.names(1),'LAP'),
-    LAP.time    = 0;
-    LAP.do      = true;
-    LAP.yhat    = NaN(n_MC,1);
-    LAP.correct = NaN(n_MC,1);
-    LAP.ind0   = NaN(n_MC,n_V);
-    LAP.ind1   = NaN(n_MC,n_V);
-else LAP.do = false;
+LAP.do = false;
+QAP.do = false;
+for i=1:length(alg)
+    if strcmp(alg.names(i),'LAP'),
+        LAP.time    = 0;
+        LAP.do      = true;
+        LAP.yhat    = NaN(n_MC,1);
+        LAP.correct = NaN(n_MC,1);
+        LAP.ind0   = NaN(n_MC,n_V);
+        LAP.ind1   = NaN(n_MC,n_V);
+    end
+    
+    if strcmp(alg.names(i),'QAP'),
+        QAP.time    = 0;
+        QAP.do      = true;
+        QAP.max_iters = ceil(alg.QAP_max_iters);
+        QAP.yhat    = NaN(n_MC,QAP.max_iters);
+        QAP.correct = NaN(n_MC,QAP.max_iters);
+        QAP.obj0    = NaN(n_MC,QAP.max_iters);
+        QAP.obj1    = NaN(n_MC,QAP.max_iters);
+        QAP.inds0    = NaN(n_MC,QAP.max_iters,n_V);
+        QAP.inds1    = NaN(n_MC,QAP.max_iters,n_V);
+    end
 end
-
-if strcmp(alg.names(2),'QAP'),
-    QAP.time    = 0;
-    QAP.do      = true;
-    QAP.max_iters = ceil(alg.QAP_max_iters);
-    QAP.yhat    = NaN(n_MC,QAP.max_iters);
-    QAP.correct = NaN(n_MC,QAP.max_iters);
-    QAP.obj0    = NaN(n_MC,QAP.max_iters);
-    QAP.obj1    = NaN(n_MC,QAP.max_iters);
-    QAP.inds0    = NaN(n_MC,QAP.max_iters,n_V);
-    QAP.inds1    = NaN(n_MC,QAP.max_iters,n_V);
-else QAP.do = false;
-end
-
 
 %% do Monte Carlo classifications
 for j=1:n_MC
@@ -108,7 +109,7 @@ if LAP.do
 end
 
 if QAP.do
-
+    
     % get stats prior to QAP'ing
     QAP.obj0_avg(1) = mean(QAP.obj0(:,1));
     QAP.obj1_avg(1) = mean(QAP.obj1(:,1));
@@ -117,7 +118,7 @@ if QAP.do
     
     QAP.obj_avg(1)  = (QAP.obj0_avg(1)+QAP.obj1_avg(1))/2;
     QAP.obj_sem(1)   = std([QAP.obj0(:,1); QAP.obj1(:,1)])/sqrt(n_MC);
-
+    
     % get stats for each iteration
     for ii=1:QAP.max_iters
         
@@ -126,12 +127,12 @@ if QAP.do
         keeper   = ~isnan(corrects);
         corrects = corrects(keeper);
         
-        % get means 
+        % get means
         QAP.Lhat(ii)        = 1-mean(corrects);
         QAP.obj0_avg(ii+1)  = mean(QAP.obj0(keeper,ii+1));
         QAP.obj1_avg(ii+1)  = mean(QAP.obj1(keeper,ii+1));
         QAP.obj_avg(ii+1)   = (QAP.obj0_avg(ii+1)+QAP.obj1_avg(ii+1))/2;
-
+        
         % get vars/stds/sems
         QAP.num(ii)         = length(corrects);
         QAP.Lsem(ii)        = sqrt(QAP.Lhat(ii)*(1-QAP.Lhat(ii)))/sqrt(QAP.num(ii));
@@ -139,7 +140,7 @@ if QAP.do
         QAP.obj1_var(ii+1)  = var(QAP.obj1(keeper,ii+1));
         QAP.obj_sem(ii+1)   = std([QAP.obj0(keeper,ii+1); QAP.obj1(keeper,ii+1)])/sqrt(QAP.num(ii));
         
-    end    
+    end
 end
 
 
@@ -154,7 +155,7 @@ end
             A1=A(ind1,ind1);
         end
         
-        if strcmp(alg.classifier,'BPI')        
+        if strcmp(alg.classifier,'BPI')
             if strcmp(alg.model,'bern')
                 loss0 = sum(sum(A0.*P.lnE0+(1-A0).*P.ln1E0))+P.lnprior0; %get_lik(A0,P.lnE0,P.ln1E0);
                 loss1 = sum(sum(A1.*P.lnE1+(1-A1).*P.ln1E1))+P.lnprior1; %get_lik(A1,P.lnE1,P.ln1E1);

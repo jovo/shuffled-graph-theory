@@ -1,18 +1,18 @@
 %% simulate independent edge models and classify using or not using the vertex names
 clear; clc
 
-n_MC= 20;                           % # of samples
-n   = 10;                           % # of vertices
+n_tst= 20;                           % # of samples
+n   = 15;                           % # of vertices
 alg.model = 'bern';
 
-fname   = 'hetero';    % different names will generate different simulations
+fname   = 'homo_kidney_egg';    % different names will generate different simulations
 switch fname                    % choose simulation parameters
     case 'homo_kidney_egg'
         
         p   = 0.5;      % prob of connection for kidney
-        q0  = 0.2;      % prob of connection for egg
-        q1  = 0.8;      % prob of connection for egg
-        egg = 1:15;      % vertices in egg
+        q0  = 0.5;      % prob of connection for egg
+        q1  = 0.25;      % prob of connection for egg
+        egg = 1:3;      % vertices in egg
         
         E0=p*ones(n);   % params in class 0
         E0(egg,egg)=q0; % egg params in class 0
@@ -20,14 +20,14 @@ switch fname                    % choose simulation parameters
         E1=p*ones(n);   % params in class 1
         E1(egg,egg)=q1; % egg params in class 1
         
-        P.n=n; P.p=p; P.q0=q0; P.q1=q1; P.egg=egg; P.S=n_MC; P.E0=E0; P.E1=E1;
+        P.n=n; P.p=p; P.q0=q0; P.q1=q1; P.egg=egg; P.S=n_tst; P.E0=E0; P.E1=E1;
         
     case 'hetero'
         
         E0=rand(n);     % params in class 0
         E1=rand(n);     % params in class 1
         
-        P.n=n; P.S=n_MC; P.E0=E0; P.E1=E1;
+        P.n=n; P.S=n_tst; P.E0=E0; P.E1=E1;
         
     case 'structured'
         
@@ -39,7 +39,7 @@ switch fname                    % choose simulation parameters
         E0([pp E0ind])=0.8;
         E1([pp E1ind])=0.8;
         
-        P.n=n; P.S=n_MC; P.E0=E0; P.E1=E1;
+        P.n=n; P.S=n_tst; P.E0=E0; P.E1=E1;
         
     case 'hetero_kidney_egg'
         
@@ -48,7 +48,7 @@ switch fname                    % choose simulation parameters
         egg = 1:5;      % vertices in egg
         E1(egg,egg)=E0(egg,egg);
         
-        P.n=n; P.S=n_MC; P.E0=E0; P.E1=E1;
+        P.n=n; P.S=n_tst; P.E0=E0; P.E1=E1;
         
     case 'hard_hetero'
         
@@ -57,7 +57,7 @@ switch fname                    % choose simulation parameters
         E1(E1>=1)=1-1e-3;   % don't let prob be >1
         E1(E1<=0)=1e-3;     % or <0
         
-        P.n=n; P.S=n_MC; P.E0=E0; P.E1=E1;
+        P.n=n; P.S=n_tst; P.E0=E0; P.E1=E1;
         
     case 'celegans'
         
@@ -75,7 +75,7 @@ switch fname                    % choose simulation parameters
         E1(thesem,thesem) = E1(thesem,thesem) + egg;
         E1(E1<0)=eps;
         
-        P.n=n; P.S=n_MC; P.E0=E0; P.E1=E1;
+        P.n=n; P.S=n_tst; P.E0=E0; P.E1=E1;
         alg.model='poiss';
         
     case 'poiss'
@@ -83,43 +83,34 @@ switch fname                    % choose simulation parameters
         E0=rand(n)*100;     % params in class 0
         E1=rand(n)*100;     % params in class 1
         
-        P.n=n; P.S=n_MC; P.E0=E0; P.E1=E1;
+        P.n=n; P.S=n_tst; P.E0=E0; P.E1=E1;
         alg.model='poiss';
         
 end
 
 alg.datadir = '../../data/';
 alg.figdir  = '../../figs/';
-alg.fname   = [fname '_n' num2str(n) '_MC' num2str(n_MC)];
+alg.fname   = [fname '_n' num2str(n) '_MC' num2str(n_tst)];
 alg.save    = 0;                    % whether to save/print results
 
-% # samples for testing and training
-S0 = n_MC; % # of samples in class 0
-S1 = n_MC; % # of samples in class 1
-
-ytst=round(rand(n_MC,1));                   % sample classes iid where P[Y=1]=1/2
+ytst=round(rand(n_tst,1));                   % sample classes iid where P[Y=1]=1/2
 
 ytst1=find(ytst==1);
 len1=sum(ytst);
 
 ytst0=find(ytst==0);
-len0=n_MC-len1;
+len0=n_tst-len1;
 
-% sample data
+% sample test data
 if strcmp(alg.model,'bern')
-    A0 = repmat(E0,[1 1 S0]) > rand(n,n,S0);    % class 0 samples
-    A1 = repmat(E1,[1 1 S1]) > rand(n,n,S1);    % class 1 samples
-    Atst=nan(n,n,n_MC);
+    Atst=nan(n,n,n_tst);
     Atst(:,:,ytst1)=repmat(E1,[1 1 len1]) > rand(n,n,len1);    % class 0 samples
     Atst(:,:,ytst0)=repmat(E0,[1 1 len0]) > rand(n,n,len0);    % class 0 samples
 elseif strcmp(alg.model,'poiss')
-    A0 = poissrnd(repmat(E0,[1 1 S0]));    % class 0 samples
-    A1 = poissrnd(repmat(E1,[1 1 S1]));    % class 1 samples
-    Atst=nan(n,n,n_MC);
+    Atst=nan(n,n,n_tst);
     Atst(:,:,ytst0)=poissrnd(repmat(E0,[1 1 len0]));    % class 0 samples
     Atst(:,:,ytst1)=poissrnd(repmat(E1,[1 1 len1]));    % class 0 samples
 end
-Atrn = cat(3,A0,A1);                        % concatenate to get all training samples
 
 
 % parameters for naive bayes classifiers
@@ -128,8 +119,8 @@ P.ln1E0 = log(1-P.E0);
 P.lnE1  = log(P.E1);
 P.ln1E1 = log(1-P.E1);
 
-P.lnprior0 = log(S0/n_MC);
-P.lnprior1 = log(S1/n_MC);
+P.lnprior0 = log(0.5);
+P.lnprior1 = log(0.5);
 
 if alg.save
     save([alg.datadir alg.fname])
@@ -140,7 +131,7 @@ end
 
 % make data unlabeled
 adj_mat=0*Atst;
-for i=n_MC
+for i=1:n_tst
     q=randperm(n);
     A=Atst(:,:,i);
     adj_mat(:,:,i)=A(q,q);
@@ -149,13 +140,13 @@ end
 % naive bayes classify
 Lhat = naive_bayes_classify(adj_mat,ytst,P);
 Lhats.rand  = Lhat.all;
-Lsems.rand  = sqrt(Lhat.all*(1-Lhat.all))/sqrt(n_MC);
+Lsems.rand  = sqrt(Lhat.all*(1-Lhat.all))/sqrt(n_tst);
 
 %% performance using true parameters and labels; this gives us L_*
 
 Lhat = naive_bayes_classify(Atst,ytst,P);
 Lhats.star  = Lhat.all;
-Lsems.star  = sqrt(Lhat.all*(1-Lhat.all))/sqrt(n_MC);
+Lsems.star  = sqrt(Lhat.all*(1-Lhat.all))/sqrt(n_tst);
 
 %% test classifier using only 2 unlabeled training samples
 
@@ -163,28 +154,44 @@ alg.classifier = 'BPI'; % could be BPI=bayes plugin or 1NN
 
 alg.QAP_max_iters   = 0.5;           % max # of iterations when using QAP
 alg.QAP_init        = eye(n);       % starting value for QAP
-alg.names   = [{'LAP'}; {'QAP'}];   % which algorithms to run
+alg.names   = [{'QAP'}];   % which algorithms to run
 alg.truth_start = false;            % start QAP at truth
 
-symmetric=true;
-if symmetric
-   for i=1:2*n_MC
-       A=Atrn(:,:,i);
-       Atrn(:,:,i)=A+A';
-   end
-   for i=1:n_MC
-      A=Atst(:,:,i);
-      Atst(:,:,i)=A+A';
-   end
+k=0;
+for n_trn=20:10:100
+    
+    % # samples for testing and training
+    S0 = n_trn; % # of samples in class 0
+    S1 = n_trn; % # of samples in class 1
+    
+    % sample data
+    if strcmp(alg.model,'bern')
+        A0 = repmat(E0,[1 1 S0]) > rand(n,n,S0);    % class 0 samples
+        A1 = repmat(E1,[1 1 S1]) > rand(n,n,S1);    % class 1 samples
+    elseif strcmp(alg.model,'poiss')
+        A0 = poissrnd(repmat(E0,[1 1 S0]));    % class 0 samples
+        A1 = poissrnd(repmat(E1,[1 1 S1]));    % class 1 samples
+    end
+    Atrn = cat(3,A0,A1);                        % concatenate to get all training samples
+    
+    symmetric=true;
+    if symmetric
+        for i=1:2*n_trn
+            A=Atrn(:,:,i);
+            Atrn(:,:,i)=A+A';
+        end
+        for i=1:n_tst
+            A=Atst(:,:,i);
+            Atst(:,:,i)=A+A';
+        end
+    end
+    k=k+1;
+    [LAP QAP] = classify_unlabeled_graphs(Atrn,Atst,ytst,P,alg);
+    Lhats.QAP(k)=QAP.Lhat;
+    Lsems.QAP(k)=QAP.Lsem;
 end
 
-[LAP QAP] = classify_unlabeled_graphs(Atrn,Atst,ytst,P,alg);
 
-Lhats.LAP=LAP.Lhat;
-Lsems.LAP=LAP.Lsem;
-
-Lhats.QAP=QAP.Lhat;
-Lsems.QAP=QAP.Lsem;
 
 if alg.save
     save([alg.datadir alg.fname '_results'])
@@ -194,12 +201,12 @@ end
 
 figure(1), clf
 subplot(231), imagesc(LAP.ind0)
-subplot(232), imagesc(squeeze(QAP.inds0))
+subplot(232), imagesc(squeeze(QAP.inds0(:,1,:)))
 diff0=LAP.ind0==squeeze(QAP.inds0);
 subplot(233), imagesc(diff0), title(sum(diff0(:))/numel(diff0))
 
 subplot(234), imagesc(LAP.ind1)
-subplot(235), imagesc(squeeze(QAP.inds1))
+subplot(235), imagesc(squeeze(QAP.inds1(:,1,:)))
 diff1=LAP.ind1==squeeze(QAP.inds1);
 subplot(236), imagesc(diff1), title(sum(diff1(:))/numel(diff1))
 

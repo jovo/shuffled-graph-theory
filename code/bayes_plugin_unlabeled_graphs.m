@@ -1,4 +1,4 @@
-function [LAP QAP] = classify_unlabeled_graphs(Atrn,Atst,ytst,P,alg)
+function [LAP QAP] = bayes_plugin_unlabeled_graphs(Atrn,Atst,ytst,P,alg)
 % this function classifies unlabeled graphs, in the following steps:
 %
 % (i) permute Atst to be like both a single Atrn in class 0 and a single
@@ -96,7 +96,7 @@ for j=1:n_MC
         QAP.obj1(j,2:iter1+1)=fs1;
         
         for ii=1:min(iter0,iter1)
-            [QAP.yhat(j,ii) QAP.correct(j,ii)] = do_classify(A,squeeze(QAP.inds0(j,ii,:)),squeeze(QAP.inds1(j,ii,:)),ytst(j),'QAP',P,Atrn(:,:,j),Atrn(:,:,j+n_MC));
+            [QAP.yhat(j,ii) QAP.correct(j,ii)] = do_classify(A,QAP.inds0(j,ii,:),QAP.inds1(j,ii,:),ytst(j),'QAP',P,Atrn(:,:,j),Atrn(:,:,j+n_MC));
         end
         QAP.time = QAP.time + cputime-starttime;
         
@@ -168,7 +168,7 @@ end
             A0=A(ind0,:);
             A1=A(ind1,:);
         elseif strcmp(AP,'QAP')
-            A0=A(ind0,ind0);
+            A0=A(ind0,ind1);
             A1=A(ind1,ind1);
         end
         

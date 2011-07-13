@@ -5,7 +5,7 @@ n_tst= 20;                           % # of samples
 n   = 15;                           % # of vertices
 alg.model = 'bern';
 
-fname   = 'hetero_easy';    % different names will generate different simulations
+fname   = 'hetero';    % different names will generate different simulations
 switch fname                    % choose simulation parameters
     case 'homo_kidney_egg'
         

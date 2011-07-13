@@ -168,7 +168,7 @@ end
             A0=A(ind0,:);
             A1=A(ind1,:);
         elseif strcmp(AP,'QAP')
-            A0=A(ind0,ind0);
+            A0=A(ind0,ind1);
             A1=A(ind1,ind1);
         end
         

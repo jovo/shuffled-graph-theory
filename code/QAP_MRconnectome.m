@@ -41,7 +41,7 @@ Lhats.star = xval_SigSub_classifier(As,ClassIDs,[],'loo');
 Utrn=0*As;
 myp=nan(n,s);
 parfor i=1:s
-    s
+    i
     if ClassIDs(i)==1
         [~, myp(:,i)]=sfw(-shuffled_graphs(:,:,i),shuffled_graphs(:,:,1)',15);
     else
@@ -51,6 +51,6 @@ parfor i=1:s
 end
 
 
-[Lhat incorrects subspace] = xval_SigSub_classifier(As,ClassIDs,[],'loo');
+[Lhat incorrects subspace] = xval_SigSub_classifier(Utrn,ClassIDs,[],'loo');
 Lhats.unshuffled=Lhat
 

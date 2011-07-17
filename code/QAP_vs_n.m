@@ -1,7 +1,7 @@
 %% simulate independent edge models and classify using or not using the vertex names
 clear; clc
 
-n_tst= 5000;                           % # of samples
+n_tst= 500;                           % # of samples
 n   = 10;                           % # of vertices
 alg.model = 'bern';
 fname   = 'hetero_easy';    % different names will generate different simulations
@@ -211,14 +211,33 @@ for jj=1:length(n_trns)
             Utrn(:,:,i)=Strn(myp(:,i),myp(:,i),i);
         end
         
-        
-        % classify using unshuffled graphs
+        % estimate parameters given unshuffled graphs
         constants=get_constants(Utrn,ytrn);
         Phat = get_ind_edge_params(Utrn,constants);
-        Lhat = naive_bayes_classify(Atst,ytst,Phat);
+
         
-        shuffle_Lhat(jj,tt)  = Lhat.all;
-        shuffle_Lsem(jj,tt)  = sqrt(Lhat.all*(1-Lhat.all))/sqrt(n_tst);
+        % classify using unshuffled graphs
+        for i=1:n_tst
+            [~, myp0]=sfw(-Strn(:,:,i),Strn(:,:,1)',15);
+            Utst0(:,:,i)=Atst(myp0(:,i),myp0(:,i),i);
+            
+            [~, myp1]=sfw(-Strn(:,:,i),Strn(:,:,n_trn/2+1)',15);
+            Utst1(:,:,i)=Atst(myp1(:,i),myp1(:,i),i);
+            
+            post0=sum(Utst0(:,:,i).*params.lnE0+(1-Utst0(:,:,i)).*params.ln1E0)+params.lnprior0;
+            post1=sum(Utst1(:,:,i).*params.lnE1+(1-Utst1(:,:,i)).*params.ln1E1)+params.lnprior1;
+            
+            [~, bar] = sort([post0, post1]); % find the bigger one
+            yhat(i)=bar(2)-1;
+        end
+        
+        Lhat_tmp = sum(yhat~=ytst)/length(ytst);
+        shuffle_Lhat(jj,tt)= Lhat_tmp;
+        shuffle_Lsem(jj,tt)  = sqrt(Lhat_tmp*(1-Lhat_tmp))/sqrt(n_tst);
+        
+%         Lhat = naive_bayes_classify(Atst,ytst,Phat);
+%         shuffle_Lhat(jj,tt)  = Lhat.all;
+%         shuffle_Lsem(jj,tt)  = sqrt(Lhat.all*(1-Lhat.all))/sqrt(n_tst);
         
     end
 end

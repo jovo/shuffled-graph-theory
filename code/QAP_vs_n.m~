@@ -169,7 +169,7 @@ Lsems.star  = sqrt(Lhat.nb*(1-Lhat.nb))/sqrt(n_tst);
 n_trns=[20:20:100 200:100:500];
 
 for jj=1:length(n_trns)
-    parfor tt=1:20
+    for tt=1:20
         
         n_trn=n_trns(jj);
         S0 = n_trn/2; % # of samples in class 0
@@ -183,6 +183,11 @@ for jj=1:length(n_trns)
             A1 = poissrnd(repmat(E1,[1 1 S1]));    % class 1 samples
         end
         Atrn = cat(3,A0,A1);                        % concatenate to get all training samples
+        for i=1:n_trn
+           A=Atrn(:,:,i);
+           Atrn(:,:,i)=A+A';
+        end
+        
         ytrn = [zeros(1,n_trn/2) ones(1,n_trn/2)];
                 
         % shuffle training data
@@ -206,10 +211,25 @@ for jj=1:length(n_trns)
             Utrn(:,:,i)=Strn(myp(:,i),myp(:,i),i);
         end
         
-        
-        % classify using unshuffled graphs
+        % estimate parameters given unshuffled graphs
         constants=get_constants(Utrn,ytrn);
         Phat = get_ind_edge_params(Utrn,constants);
+
+        
+        % classify using unshuffled graphs
+        for i=1:n_tst
+        [~, myp0]=sfw(-Strn(:,:,i),Strn(:,:,1)',15);
+        Utst0(:,:,i)=Atst(myp0(:,i),myp0(:,i),i);
+        
+        [~, myp1]=sfw(-Strn(:,:,i),Strn(:,:,n_trn/2+1)',15);
+        Utst1(:,:,i)=Atst(myp1(:,i),myp1(:,i),i);
+                
+        post0=sum(data_tmp.*params.lnE0(ind)+(1-data_tmp).*params.ln1E0(ind))+params.lnprior0;
+        post1=sum(data_tmp.*params.lnE1(ind)+(1-data_tmp).*params.ln1E1(ind))+params.lnprior1;
+
+        end
+        
+        
         Lhat = naive_bayes_classify(Atst,ytst,Phat);
         
         shuffle_Lhat(jj,tt)  = Lhat.all;

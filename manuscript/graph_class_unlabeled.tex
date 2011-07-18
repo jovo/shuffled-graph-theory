@@ -172,7 +172,7 @@ A \emph{shuffled graph classifier} is also any function $h: \mc{G}_n \mapsto \mc
 
 The \emph{shuffled graph Bayes optimal graph classifier} is given by
 \begin{align}
-	h_*' &= \argmin_{h \in \mc{H}} L'(h) %, \qquad %\\
+	h_*' &= \argmin_{h \in \mc{H}} L'(h). %, \qquad %\\
 \end{align}
 The \emph{shuffled Bayes risk} is given by
 \begin{align}
@@ -219,9 +219,9 @@ and $\mt{L}_*$ implicitly depends on $\PP_{\mt{\GG},Y}$.
 
 The three Bayes graph classifiers can be written explicitly in terms of their model parameters:
 \begin{align}
-	h_*(G) &= \argmax_{y \in \mc{Y}} \theta_{G|y}\pi_y, \\
-	h_*'(G) &= \argmax_{y \in \mc{Y}} \theta_{G|y}' \pi_y, \\
-	\mt{h}_*(\mt{G}) &= \argmax_{y \in \mc{Y}}  \mt{\theta}_{\mt{G}|y}\pi_y. \label{eq:unbayes2}
+	h_* &= \argmax_{y \in \mc{Y}} \theta_{G|y}\pi_y, \\
+	h_*' &= \argmax_{y \in \mc{Y}} \theta_{G|y}' \pi_y, \\
+	\mt{h}_* &= \argmax_{y \in \mc{Y}}  \mt{\theta}_{\mt{G}|y}\pi_y. \label{eq:unbayes2}
 \end{align}
 
 
@@ -236,7 +236,7 @@ The three Bayes graph classifiers can be written explicitly in terms of their mo
 
 
 
-The result of passing a graph through a shuffle channel can only degrade, but not improve Bayes risk.  This is a restatement of the data processing lemma for this scenario. Specifically, \cite{DEV96} shows that the data processing lemma indicates that in the classification domain, $L^*_X \leq L^*_{T(X)}$, for any statistic $T$ and data $X$.  In our setting, this becomes:
+The result of either shuffling or unlabeling a graph can only degrade, but not improve Bayes risk.  This is a restatement of the data processing lemma for this scenario. Specifically, \cite{DEV96} shows that the data processing lemma indicates that in the classification domain, $L^*_X \leq L^*_{T(X)}$, for any statistic $T$ and data $X$.  In our setting, this becomes:
 
 \begin{thm} \label{thm:1}
 $L_* \leq \mt{L}_*=L_*'$.
@@ -245,12 +245,13 @@ $L_* \leq \mt{L}_*=L_*'$.
 \begin{proof}
 	Assume $|\mc{Y}|=2$ and $\pi_0=\pi_1=1/2$.  
 \begin{align} \label{eq:thm1}
-	\mt{L}_*&=\sum_{\mt{G} \in \mt{\mc{G}}_n} \min_y \mt{\PP}_{y}(\mt{G})
-	% \nonumber \\&
-	=\sum_{\mt{G} \in \mt{\mc{G}}_n} \min_y \sum_{G' \in \mt{G}}\PP_y(G')
-	\nonumber \\& \geq \sum_{\mt{G} \in \mt{\mc{G}}_n}\sum_{G' \in \mt{G}}\min_y\PP_y(G')=L_*.
+	\mt{L}_*&=\sum_{\mt{G} \in \mt{\mc{G}}_n} \min_y  \mt{\theta}_{\mt{G}|y}  
+	=\sum_{\mt{G} \in \mt{\mc{G}}_n} \min_y  \sum_{G \in \mt{G}}\theta_{G|y}'  = L_*' \nonumber \\
+	&=\sum_{\mt{G} \in \mt{\mc{G}}_n} \min_y  \sum_{G \in \mt{G}}\theta_{G|y} 
+	 \geq \sum_{\mt{G} \in \mt{\mc{G}}_n} \sum_{G \in \mt{G}} \min_y  \theta_{G|y}  = L_*.
+	% & \geq \sum_{\mt{G} \in \mt{\mc{G}}_n}\sum_{G' \in \mt{G}}\min_y\PP_y(G')=L_*.
 \end{align}
-It is trivially true that $\mt{L}_*=L_*'$.
+% It is trivially true that $\mt{L}_*=L_*'$.
 \end{proof}
 
 
@@ -258,9 +259,13 @@ It is trivially true that $\mt{L}_*=L_*'$.
 An immediate consequence of the above proof is that the inequality in Theorem \ref{thm:1} is a \emph{strict inequality} whenever the inequality in Eq. \ref{eq:thm1} is strict:
 
 \begin{thm}
-	$L_* < \mt{L}_*$ if and only if $$\min_y \mt{\PP}_{y}(\mt{G}) > \sum_{G' \in \mt{G}}\min_y\PP_y(G').$$
+	$L_* < \mt{L}_*,L'_*$ if and only if there exists $\mt{G}$ such that
+	% $$\min_y \mt{\PP}_{y}(\mt{G}) > \sum_{G' \in \mt{G}}\min_y\PP_y(G').$$
+	$$\min_y \mt{\theta}_{\mt{G}|y} > \sum_{G \in \mt{G}}\min_y \theta_{G|y}.$$
 \end{thm}
-The above result demonstrates that even when the labels \emph{do} carry some class-conditional signal, it may be the case that a shuffle channel does not degrade performance.  In other words, to state that labels contain information is equivalent to stating that some graphs within an isomorphism set are class-conditionally more likely than others: $\exists \, \theta_{i|y} \neq \theta_{j|y}$ and $\Qs(G_i)=G_j$ for some $G_i,G_j \in \mc{G}_n$ and $\Qs \in \mc{Q}_n$, and that $\theta_{i|y}\neq \theta_{i|y'}$ or $\theta_{j|y}\neq \theta_{j|y'}$.  Shuffling has the effect of ``flattening'' likelihoods within isomorphism sets, from $\bth_y$ to $\bth_y'$, where $\bth_y'$ satisfies $\{\theta_{i|y}'=\mt{\theta}_{j|y}/|\mt{G}_j| \, \forall i : G_i \in \mt{G}_j\}$.  But just because the shuffling changes class-conditional likelihoods does \emph{not} mean that Bayes risk must also change. This result follows immediately upon realizing that posteriors can change without classification performance changing.  The above results hold in the absence of equal priors, and are easily generalized to  $c$-class classification problems.  To see that, ignoring ties, simply replace each minimum with a sum over all non-maxima: $$\min_y \PP_y(G) \mapsto \sum_{y \in \mc{Y}'} \PP_y(G) \text{ where } \mc{Y}' =\{y : y \neq \argmax_y \PP_y\}.$$
+The above result demonstrates that even when the labels \emph{do} carry some class-conditional signal, it may be the case that a shuffle channel does not degrade performance.  In other words, to state that labels contain information is equivalent to stating that some graphs within an isomorphism set are class-conditionally more likely than others: $\exists \, \theta_{G_i|y} \neq \theta_{G_j|y}$ where $\Qs(G_i)=G_j$ for some $G_i,G_j \in \mc{G}_n$ and $\Qs \in \mc{Q}_n$, and that $\theta_{G_i|y}\neq \theta_{G_i|y'}$ or $\theta_{G_j|y}\neq \theta_{G_j|y'}$.  Shuffling has the effect of ``flattening'' likelihoods within isomorphism sets, from $\bth_y$ to $\bth_y'$, so that $\bth_y'$ satisfies $\{\theta_{G|y}'=\mt{\theta}_{\mt{G}|y}/|\mt{G}| \, \forall : G \in \mt{G}\}$.  But just because the shuffling changes class-conditional likelihoods does \emph{not} mean that Bayes risk must also change. This result follows immediately upon realizing that posteriors can change without classification performance changing.  The above results hold in the absence of equal priors, and are easily generalized to  $c$-class classification problems.  To see that, ignoring ties, simply replace each minimum with a sum over all non-maxima: 
+% $$\min_y \PP_y(G) \mapsto \sum_{y \in \mc{Y}'} \PP_y(G) \text{ where } \mc{Y}' =\{y : y \neq \argmax_y \PP_y\}.$$
+$$\min_y \theta_{G|y} \mapsto \sum_{y \in \mc{Y}'} \theta_{G|y} \text{ where } \mc{Y}' =\{y : y \neq \argmax_y \theta_{G|y}\}.$$
 
 
 
@@ -280,9 +285,9 @@ where $\Psi$ is the space of all possible invariants and $\mc{F}^{\psi}$ is the 
 Let $\psi$ indicate in which equivalence set $G$ resides; that is,  $\psi(G)=j$ if and only if $G \in \mt{G}_j$.  Then
 % $f_{G'}(G)$ be a graph matching function; that is, $f: \mc{G}_n \times \mc{G}_n \mapsto \{0,1\}$, taking value unity whenever $G$ and $G'$ are isomorphic to one another.  Let $\psi(G)=\mb{f}(G)$, where $\mb{f}=(f_{G_1}, \ldots, f_{G_{\mt{d}}})$.  In words, $\phi(G)$ outputs a vector of length $\mt{d}$ with a single non-zero entry in the isomorphism set of $G$.  Let $h^{\psi}$ be an indicator function for the maximum a posteriori class of the corresponding isomorphism set. For instance, if $G \in \mt{G}_j$, then
 \begin{align}
-	h^{\psi}= \argmax_{y \in \mc{Y}} \mt{\theta}_{\psi(G)|y} \pi_y.
+	h^{\psi}= \argmax_{y \in \mc{Y}} \mt{\theta}_{\psi(G)|y} \pi_y = \argmax_{y \in \mc{Y}} \mt{\theta}_{\mt{G}|y} \pi_y = \mt{h}_*.
 \end{align}
-Thus, this graph invariant based classifier is the unlabeled Bayes optimal classifier.
+% Thus, this graph invariant based classifier is the unlabeled Bayes optimal classifier.
 \end{proof}
 
 
@@ -291,11 +296,11 @@ Thus, this graph invariant based classifier is the unlabeled Bayes optimal class
 \label{sec:bayes_optimal_graph_invariant_based_classifier}
 
 
-Section \ref{sec:shuffle} shows that one cannot fruitfully ``unshuffle'' graphs: once they have been shuffled by a uniform shuffler, the label information is lost.  Section \ref{sec:gi} shows that if graphs have been uniformly shuffled, there is a relatively straightforward algorithm for optimally classifying. However, that classifier depends on knowing $\PP'=\PP_{\QQ,\GG,Y}$ a priori. Instead we consider  $(\QQ_i,\GG_i,Y_i)\overset{iid}{\sim}\PP'$.  For shuffled graph classification we only observe the \emph{training data} $\mc{T}_s=\{\GG_i',Y_i\}_{i \in [s]}$, where $\GG_i'=\QQ_i(\GG_i)$, and are thusly unable to observe useful vertex labels.  Moreover, $\PP_{\QQ}$ is uniform, such that all label information is both unavailable and irrecoverable.  Our task is to utilize training data to induce a classifier, $\mh{h}_s: \mc{G}_n \times (\mc{G}_n \times \mc{Y})^s \mapsto \mc{Y}$ that approximates $\mt{h}_*$ as closely as possible.  
+Section \ref{sec:shuffle} shows that one cannot fruitfully ``unshuffle'' graphs: once they have been shuffled by a uniform shuffler, the label information is lost.  Section \ref{sec:gi} shows that if graphs have been uniformly shuffled, there is a relatively straightforward algorithm for optimally classifying. However, that classifier depends on knowing the parameters, $\mt{\bth}=\{\mt{\bth}_y\}_{y\in \mc{Y}}$ and $\mb{\pi}=\{\pi_y\}_{y \in \mc{Y}}$. Instead we consider  $(\QQ_i,\GG_i,Y_i)\overset{iid}{\sim}\PP_{\QQ,\GG,Y}$.  For shuffled graph classification we only observe the \emph{training data} $\mc{T}_s=\{\GG_i',Y_i\}_{i \in [s]}$, where $\GG_i'=\QQ_i(\GG_i)$, and are thusly unable to observe useful vertex labels.  Moreover, $\PP_{\QQ}$ is uniform, such that all label information is both unavailable and irrecoverable.  Our task is to utilize training data to induce a classifier, $\mh{h}_s: \mc{G}_n \times (\mc{G}_n \times \mc{Y})^s \mapsto \mc{Y}$ that approximates $\mt{h}_*$ as closely as possible.  
 
-A Bayes plugin unlabeled graph-classifier estimates the likelihood and prior terms and plugs them in to Eq. \eqref{eq:unbayes2}:
+An unlabeled graph Bayes \emph{plugin} classifier estimates the likelihood and prior terms and plugs them in to Eq. \eqref{eq:unbayes2}:
 \begin{align} \label{eq:class}
-	\mh{h}_s(G)=\argmax_{y\in\mc{Y}} \mh{\mt{\theta}}_{j|y}\mh{\pi}_y, \text{ where } G\in \mt{G}_j
+	\mh{h}_s(G)=\argmax_{y\in\mc{Y}} \mh{\mt{\theta}}_{j|y}\mh{\pi}_y, \text{ where } G\in \mt{G}_j.
 \end{align}
 
 \begin{thm} \label{thm:conv}
@@ -303,7 +308,8 @@ A Bayes plugin unlabeled graph-classifier estimates the likelihood and prior ter
 \end{thm}
 
 \begin{proof}
-Given consistent estimators for $\mb{\mt{\theta}}=\{\mb{\mt{\theta}}_y\}_{y\in\mc{Y}}$ and $\mb{\pi}=\{\pi_y\}_{y \in \mc{Y}}$, the Bayes plugin classifier is also consistent \cite{DEV96}.  Formally, if $\mhb{\mt{\theta}} \conv \mb{\mt{\theta}}$ and $\mhb{\pi} \conv \mb{\pi}$ as $s \conv \infty$, then $\mh{h}_s \conv \mt{h}_*$ as $s\conv \infty$.  Because $\mc{G}_n$ and $\mc{Y}$ are both finite, the empirical distributions are guaranteed to converge by law of large numbers.  Thus, $\mh{h}_s \conv \mt{h}^*$ as $s \conv \infty$.
+Given consistent estimators for $\mb{\mt{\theta}}$ and $\mb{\pi}$, the Bayes plugin classifier is also consistent \cite{DEV96}.  Formally, if $\mhb{\mt{\theta}} \conv \mb{\mt{\theta}}$ and $\mhb{\pi} \conv \mb{\pi}$ as $s \conv \infty$, then $\mh{h}_s \conv \mt{h}_*$ as $s\conv \infty$.  Because $\mc{G}_n$ and $\mc{Y}$ are both finite, the empirical distributions are guaranteed to converge by law of large numbers.  
+% Thus, $\mh{h}_s \conv \mt{h}^*$ as $s \conv \infty$.
 \end{proof}
 
 
@@ -312,21 +318,32 @@ Given consistent estimators for $\mb{\mt{\theta}}=\{\mb{\mt{\theta}}_y\}_{y\in\m
 \section{A Practical Approach to Unlabeled Graph Classification} % (fold)
 \label{sec:a_practical_approach_to_unlabeled_graph_classification}
 
-Although Eq. \ref{eq:class} yields consistency from Theorem \ref{thm:conv}, utilizing this is practically hopeless.  In the unlabeled case, this requires solving an infinite number of NP-hard problems.  Specifically, using Eq. \ref{eq:conv} requires $\mb{f}$ from Section \ref{sec:gi}, which is a graph matching function.  Graph matching is known to be NP-hard \cite{Conte04}.  Although there is some hope because most graph matching problems can be solved in polynomial time \cite{Conte04}, that hope is lost upon discovering that the constant is crazy large \cite{Conte04}.  We therefore consider an approximate approach as follows.
+Although Eq. \ref{eq:class} yields consistency from Theorem \ref{thm:conv}, utilizing this is practically hopeless as it requires solving an infinite number of NP-hard problems.  Specifically, using Eq. \ref{eq:class} requires first enumerating all all $\mt{d}_n$ isomorphism sets, then determining in which isomorphism class each of the infinite training graphs resides.  Each graph isomorphism problem is NP-incomplete (meaning that it is not known to belong in either P or NP).  After solving an infinite number of NP-incomplete problems, to classify, we again solve graph isomorphism for the to-be-classified graph.  This approach is therefore impractical on two levels: (i) the number of parameters to estimate, $\mt{d}$, is too large and (ii) exact graph isomorphism is too computationally taxing.  We therefore consider a modified approach.
 
-We assume $(\QQ,\GG,Y), (\QQ_1,\GG_1,Y_1),\ldots, (\QQ_s,\GG_s,Y_s) \overset{iid}{\sim} \PP'$, and we only observe $\GG', \mc{T}_s$, where  $\mc{T}_s=\{(\GG_i',Y_i)\}_{i \in [s]}$ and $\GG_i'=\QQ_i(\GG_i)$. Given these training data $\mc{T}_s$, we proceed as follows.  
-
-For each class, $y \in \mc{Y}$, choose an exemplar (or prototype \cite{Bunke2011}) shuffled graph, $\GG'_{y+} \in \{\GG_i'\}_{i: y_i=y}$.  Then, try to ``unshuffle'' each shuffled graph in each class to its corresponding prototype using an inexact graph matching algorithm, $\mh{f}_y=\mh{f}_{\GG'_{y+}}$.  Although many inexact graph matching algorithms are available, we select the quadratic assignment problem (QAP) based approach developed in \cite{VP11QAP}, which is cubic in $n$ and outperforms the previous state-of-the-art on all benchmarks tested.  This yields $\{\mh{\GG}_i\}$, which we can then use to estimate the \emph{labeled} likelihoods, $\PP_{\GG|Y=y}$.   
-
-Now, although it may seem as we projected our graphs from a space of cardinality $\mt{d}$ to $\mt{d} \times n!$, given the labeled graphs, a variety of asymptotically optimal graph classification algorithms are available with much faster convergence rates (under much simpler models).  Specifically, we choose to use the signal-subgraph classifier developed in \cite{VP11sigsub}.  Under the independent edge assumption, the likelihood of an edge is given by $\PP[A_{uv}|Y=y]=\PP_{uv|y}$, yielding a likelihood factorization: $\PP_y=\prod_{uv}\PP_{uv|y}$. Thus, the class-conditional distribution is given by a matrix, $P_y \in (0,1)^{n \times n}$.   The labeled graphs, $\{\mh{\GG}_i\}$ can be used to estimate these likelihood matrices, $\{P_y\}$, as described in \cite{VP11sigsub} using L-estimators to bound the estimates from the boundaries.   Now, we can use a Bayes plugin labeled graph classifier via the class-conditional posterior estimates:
-\begin{align}
-	\mh{y}=\argmax_{y \in \mc{Y}} \mh{\rho}_y 
-	\text{ where } \mh{\rho}_y=\mh{\PP}_{uv|y}(\mh{f}_y(G)) \mh{\pi}_y.
+Recall from \cite{VP11super} that a $k_s$ nearest-neighbor ($k$NN) classifier is universally consistent for labeled graph classification problems.  If $k$NN converges faster than the empirical CDF approach, it ``must'' be because the distance function used effectively smoothes over ``nearby'' parameters in $\mtb{\theta}_y$, where nearby is defined by the chosen distance. \cite{VP11super} chose squared-Frobenius norm as the distance, $d(G_i,G_j)=\norm{G_i-G_j}_F^2$.  Therefore, to deal with the excessively large number of parameters problem mentioned above, we use a graph-matched Frobenius norm as the distance function, 
+\begin{align} \label{eq:d}
+d(G_i,G_j)=\argmin_{Q \in \mc{Q}_n}\norm{Q(G_i)-G_j}_F^2.	
 \end{align}
+Eq. \eqref{eq:d} requires solving a graph matching problem, which is NP-hard.  Therefore, we instead use an inexact graph matching approach, based on the quadratic assignment formulation described in \cite{VP11QAP}.  This strategy is only cubic instead of super-exponential in $n$, and therefore yields a further significant enhancement of convergence rate.  Note that while the $k$NN approach maintains universal consistency \cite{VP11super}, the inexact graph matching approximation may not be optimal under certain distributions.  
+
+The $k$NN classifier for shuffled graphs therefore proceeds as follows.  First, compute the graph-matched Frobenius norm distance between the test graph and all training graphs, $\{d_i=d(G,G_i)\}_{i \in [s]}$.  Second, order the graph/class pairs according to their distances, $d_{(1)} \leq \cdots \leq d_{(s)}$.  Finally, let the estimated class be the plurality class of the $k_s$ closet graphs; that is, $\mh{y}=\argmax_{y \in \mc{Y}} \sum_{i \in [k_s]} \II\{y_{(i)}=y\}$. This algorithm depends on a rule for $k_s$ that satisfies $k_s \conv \infty$ but $k_s/s \conv 0$ as $s \conv \infty$.  We let $k_s=1$ for $s<10^6$ and then $k_s=1/s$ thereafter.
 
 
-To gain some intuition with regard to why this approach would be successful, consider the following simple yet illustrative example.  Let each $\mt{\PP}_y$ puts all its mass on a single but distinct isomorphism set, so $\mt{\theta}_{j|y_j}=1$ and $\mt{\theta}_{j'|y_j}=0 \, \forall j' \neq j$.  Thus, if $\mh{f}_y$ worked, then every edge present in a class would have unity likelihood, and all other edges would have zero likelihood.  Thus, a single class will have a posterior estimate equal to unity, which will therefore be the maximum a posteriori class.  This simple example can be extended without modification
-to allow each class have a non-overlapping set of non-zero likelihoods.  Moreover, reverting to the simple two-class and two non-zero likelihood scenario, consider a different generalization.  %Let both classes have the same two non-zero likelihood values, that is $\mt{\theta}_{i|y_i} > 0$ for $i=0,1$.  But, let the likelihoods be highly unbalanced, such that $\mt{\theta}_{0|y_0} /gg \mt{\theta}_{1|y_0}$ and $\mt{\theta}_{1|y_1} \gg \mt{\theta}_{0|y_1}$.  In class 1, the independent edge model would have zeros in all edges that are not in either class under some prototype choice.  
+
+% We assume $(\QQ,\GG,Y), (\QQ_1,\GG_1,Y_1),\ldots, (\QQ_s,\GG_s,Y_s) \overset{iid}{\sim} \PP'$, and we only observe $\GG', \mc{T}_s$, where  $\mc{T}_s=\{(\GG_i',Y_i)\}_{i \in [s]}$ and $\GG_i'=\QQ_i(\GG_i)$. Given these training data $\mc{T}_s$, we proceed as follows.  
+% 
+% For each class, $y \in \mc{Y}$, choose an exemplar (or prototype \cite{Bunke2011}) shuffled graph, $\GG'_{y+} \in \{\GG_i'\}_{i: y_i=y}$.  Then, try to ``unshuffle'' each shuffled graph in each class to its corresponding prototype using an inexact graph matching algorithm, $\mh{f}_y=\mh{f}_{\GG'_{y+}}$.  Although many inexact graph matching algorithms are available, we select the quadratic assignment problem (QAP) based approach developed in \cite{VP11QAP}, which is cubic in $n$ and outperforms the previous state-of-the-art on all benchmarks tested.  This yields $\{\mh{\GG}_i\}$, which we can then use to estimate the \emph{labeled} likelihoods, $\PP_{\GG|Y=y}$.   
+% 
+% Now, although it may seem as we projected our graphs from a space of cardinality $\mt{d}$ to $\mt{d} \times n!$, given the labeled graphs, a variety of asymptotically optimal graph classification algorithms are available with much faster convergence rates (under much simpler models).  Specifically, we choose to use the signal-subgraph classifier developed in \cite{VP11sigsub}.  Under the independent edge assumption, the likelihood of an edge is given by $\PP[A_{uv}|Y=y]=\PP_{uv|y}$, yielding a likelihood factorization: $\PP_y=\prod_{uv}\PP_{uv|y}$. Thus, the class-conditional distribution is given by a matrix, $P_y \in (0,1)^{n \times n}$.   The labeled graphs, $\{\mh{\GG}_i\}$ can be used to estimate these likelihood matrices, $\{P_y\}$, as described in \cite{VP11sigsub} using L-estimators to bound the estimates from the boundaries.   Now, we can use a Bayes plugin labeled graph classifier via the class-conditional posterior estimates:
+% \begin{align}
+% 	\mh{y}=\argmax_{y \in \mc{Y}} \mh{\rho}_y 
+% 	\text{ where } \mh{\rho}_y=\mh{\PP}_{uv|y}(\mh{f}_y(G)) \mh{\pi}_y.
+% \end{align}
+% 
+% 
+% To gain some intuition with regard to why this approach would be successful, consider the following simple yet illustrative example.  Let each $\mt{\PP}_y$ puts all its mass on a single but distinct isomorphism set, so $\mt{\theta}_{j|y_j}=1$ and $\mt{\theta}_{j'|y_j}=0 \, \forall j' \neq j$.  Thus, if $\mh{f}_y$ worked, then every edge present in a class would have unity likelihood, and all other edges would have zero likelihood.  Thus, a single class will have a posterior estimate equal to unity, which will therefore be the maximum a posteriori class.  This simple example can be extended without modification
+% to allow each class have a non-overlapping set of non-zero likelihoods.  Moreover, reverting to the simple two-class and two non-zero likelihood scenario, consider a different generalization.  
+%%Let both classes have the same two non-zero likelihood values, that is $\mt{\theta}_{i|y_i} > 0$ for $i=0,1$.  But, let the likelihoods be highly unbalanced, such that $\mt{\theta}_{0|y_0} /gg \mt{\theta}_{1|y_0}$ and $\mt{\theta}_{1|y_1} \gg \mt{\theta}_{0|y_1}$.  In class 1, the independent edge model would have zeros in all edges that are not in either class under some prototype choice.  
 
 
 % section a_practical_approach_to_unlabeled_graph_classification (end)

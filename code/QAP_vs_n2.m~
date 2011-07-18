@@ -1,10 +1,10 @@
 %% simulate independent edge models and classify using or not using the vertex names
 clear; clc
 
-n_tst= 5000;                           % # of samples
+n_tst= 500;                           % # of samples
 n   = 10;                           % # of vertices
 alg.model = 'bern';
-fname   = 'hetero_easy';    % different names will generate different simulations
+fname   = 'BLSA0317_synth';    % different names will generate different simulations
 
 alg.fname   = [fname '_n' num2str(n) '_MC' num2str(n_tst)];
 switch fname                    % choose simulation parameters
@@ -91,32 +91,20 @@ switch fname                    % choose simulation parameters
         
         alg.model='poiss';
         
-    case 'MRconnectomes'
+    case 'BLSA0317_synth'
         
-        load('~/Research/projects/active/ind_edge_classifier/data/results/BLSA0317_Count_synthetic.mat')
+        load('~/Research/projects/active/ind_edge_classifier/data/results/BLSA0317_Count_Lhats');
 
-        
-        t=200;
-        siz=size(AdjMats);
-        n=siz(1);
-        s=siz(3);
-        As=0*AdjMats;
-        for i=1:s
-            A=(AdjMats(:,:,i));
-            A(A<=t)=0;
-            A(A>t)=1;
-            As(:,:,i)=A;
-        end
-        
         constants=get_constants(As,ClassIDs);
-        Phat=get_ind_edge_params(As,constants);
+        Psynth = get_ind_edge_params(As,constants);
         
-        totalmean=mean(As,3);
-        
-        
-        
-        
+        E0=Psynth.E0;
+        E1=Psynth.E1;
 
+
+        totalmean=mean(As,3);
+        E0=totalmean;
+        E
         
 end
 
@@ -132,7 +120,7 @@ alg.datadir = '../data/';
 alg.figdir  = '../figs/';
 alg.save    = 0;                    % whether to save/print results
 
-ytst=[zeros(n_tst/2,1); ones(n_tst/2,1)]; %round(rand(n_tst,1));                   % sample classes iid where P[Y=1]=1/2
+ytst=repmat([0 1],1,n_tst/2); %[zeros(n_tst/2,1); ones(n_tst/2,1)]; %round(rand(n_tst,1));                   % sample classes iid where P[Y=1]=1/2
 
 ytst1=find(ytst==1);
 len1=sum(ytst);
@@ -149,6 +137,10 @@ elseif strcmp(alg.model,'poiss')
     Atst=nan(n,n,n_tst);
     Atst(:,:,ytst0)=poissrnd(repmat(E0,[1 1 len0]));    % class 0 samples
     Atst(:,:,ytst1)=poissrnd(repmat(E1,[1 1 len1]));    % class 0 samples
+end
+for i=1:n_tst
+    A=Atst(:,:,i);
+    Atst(:,:,i)=A+A';
 end
 
 
@@ -193,11 +185,12 @@ Lsems.star  = sqrt(Lhat.nb*(1-Lhat.nb))/sqrt(n_tst);
 %% sample training data
 % # samples for testing and training
 
-n_trns=[20:20:100 200:100:500];
-
+n_trns=[10:10:100]; % 200:100:500];
+tic
 for jj=1:length(n_trns)
+    jj
     for tt=1:20
-        
+        tt
         n_trn=n_trns(jj);
         S0 = n_trn/2; % # of samples in class 0
         S1 = n_trn/2; % # of samples in class 1
@@ -238,18 +231,38 @@ for jj=1:length(n_trns)
             Utrn(:,:,i)=Strn(myp(:,i),myp(:,i),i);
         end
         
-        
-        % classify using unshuffled graphs
+        % estimate parameters given unshuffled graphs
         constants=get_constants(Utrn,ytrn);
         Phat = get_ind_edge_params(Utrn,constants);
-        Lhat = naive_bayes_classify(Atst,ytst,Phat);
+
         
-        shuffle_Lhat(jj,tt)  = Lhat.all;
-        shuffle_Lsem(jj,tt)  = sqrt(Lhat.all*(1-Lhat.all))/sqrt(n_tst);
+        % classify using unshuffled graphs
+        
+        for i=1:n_tst
+            [~, myp0]=sfw(-Atst(:,:,i),Strn(:,:,1)',15);
+            Utst0=Atst(myp0,myp0,i);
+            
+            [~, myp1]=sfw(-Atst(:,:,i),Strn(:,:,n_trn/2+1)',15);
+            Utst1=Atst(myp1,myp1,i);
+            
+            post0=sum(Utst0(:).*Phat.lnE0(:)+(1-Utst0(:)).*Phat.ln1E0(:))+Phat.lnprior0;
+            post1=sum(Utst1(:).*Phat.lnE1(:)+(1-Utst1(:)).*Phat.ln1E1(:))+Phat.lnprior1;
+            
+            [~, bar] = sort([post0, post1]); % find the bigger one
+            yhat(i)=bar(2)-1;
+        end
+        
+        Lhat_tmp = sum(yhat~=ytst)/length(ytst);
+        shuffle_Lhat(jj,tt)= Lhat_tmp;
+        shuffle_Lsem(jj,tt)  = sqrt(Lhat_tmp*(1-Lhat_tmp))/sqrt(n_tst);
+        
+%         Lhat = naive_bayes_classify(Atst,ytst,Phat);
+%         shuffle_Lhat(jj,tt)  = Lhat.all;
+%         shuffle_Lsem(jj,tt)  = sqrt(Lhat.all*(1-Lhat.all))/sqrt(n_tst);
         
     end
 end
-
+toc
 if alg.save
     save([alg.datadir alg.fname '_results'])
 end

@@ -33,7 +33,7 @@ Carey~E.~Priebe% <-this % stops a space
 of Applied Mathematics and Statistics, Johns Hopkins University, Baltimore, MD 21218.  %\protect\\
 % note need leading \protect in front of \\ to get a newline within \thanks as
 % \\ is fragile and will error, could use \hfil\break instead.
-E-mail: joshuav@jhu.edu
+E-mail: \{joshuav,cep\}@jhu.edu
 % \IEEEcompsocthanksitem R.J. Vogelstein is with the Johns Hopkins University Applied Physics Laboratory, Laurel, MD, 20723.
 }% <-this % stops a space
 \thanks{}}
@@ -64,7 +64,7 @@ statistical inference, graph theory, network theory, structural pattern recognit
 
 \IEEEPARstart{T}{his} work addresses graph classification in the presence of vertex label shuffling.   
 % Consider the following idealized scenario. 
-A (labeled) graph $G=(\mc{V},\mc{E})$ consists of a vertex set, $\mc{V}=[n]$, where $n < \infty$ is number of vertices and $[n]=\{1,\ldots, n\}$, and an edge set $\mc{E} \subseteq \binom{[n]}{2}$.  Vertex labels may or may not be observed.  In the latter case, vertex $v$ in one graph cannot be assumed to correspond to vertex $v$ in another graph.
+A (labeled) graph $G=(\mc{V},\mc{E})$ consists of a vertex set, $\mc{V}=[n]$, where $n < \infty$ is the number of vertices and $[n]=\{1,\ldots, n\}$, and an edge set $\mc{E} \subseteq \binom{[n]}{2}$.  Vertex labels may or may not be observed.  In the latter case, vertex $v$ in one graph cannot be assumed to correspond to vertex $v$ in another graph.
 
 MOTIVATION
 
@@ -81,7 +81,7 @@ MOTIVATION
 % subsection a_labeled_graph_classification_model (end)
 
  Let $\GG\colon \Omega \to \mc{G}_n$ be a graph-valued random variable taking values $G\in \mc{G}_n$, where $\mc{G}_n$ is the set of graphs on $n$ vertices, and $|\mc{G}_n|=2^{\binom{n}{2}}=d_n$. 
-Let $Y$ be a categorical random variable, $Y\colon \Omega \to \mc{Y}=\{y_1,\ldots, y_{c}\}$, where $c< \infty$.  Assume the existence of a joint distribution, $\PP_{\GG,Y}$ which can be decomposed into the product of a class-conditional distribution (likelihood) $\PP_{\GG|Y}$ and a prior $\pi_Y$. Because $n$ is finite, the class-conditional distribution distributions $\PP_{\GG | Y=y}=\PP_{\GG|y}$ can be considered discrete distributions $\text{Discrete}(G; \bth_y)$, where $\bth_y \in \bTh_{d_n}$ are $d_n$-dimensional vectors with entries satisfying $\theta_{G|y}\geq 0$ $\forall G \in \mc{G}_n$ and $\sum_{G \in \mc{G}_n} \theta_{G|y}=1$.
+Let $Y$ be a categorical random variable, $Y\colon \Omega \to \mc{Y}=\{y_1,\ldots, y_{c}\}$, where $c< \infty$.  Assume the existence of a joint distribution, $\PP_{\GG,Y}$ which can be decomposed into the product of a class-conditional distribution (likelihood) $\PP_{\GG|Y}$ and a class prior $\pi_Y$. Because $n$ is finite, the class-conditional  distributions $\PP_{\GG | Y=y}=\PP_{\GG|y}$ can be considered discrete distributions $\text{Discrete}(G; \bth_y)$, where $\bth_y$ is an element of the $d_n$-dimensional unit simplex $\triangle_{d_n}$ (satisfying $\theta_{G|y}\geq 0$ $\forall G \in \mc{G}_n$ and $\sum_{G \in \mc{G}_n} \theta_{G|y}=1$).
 
 
 % $\bth_y=[\theta_{1|y},\ldots \theta_{d|y}]\T \in \triangle_d$, where  $d=|\mc{G}_n|=2^{\binom{n}{2}}$ and $\triangle_d$ is the $d$-dimensional simplex (that is, $\theta_{i|y}\geq 0$ for all $i \in [d]$ and $\sum_{i \in [d]} \theta_{i|y}=1$). 
@@ -95,7 +95,7 @@ In the above, it was implicitly assumed that the vertex labels were observed.  H
 \begin{align}
 	\PP_{\QQ,\GG,Y} = \PP_{\QQ} \PP_{\GG,Y} = \PP_{\QQ} \PP_{\GG |Y} \pi_Y.
 \end{align}
-As in the labeled case, the shuffled graph class-conditional distributions $\PP_{\QQ(\GG)|y}$ can be represented by discrete distributions $\text{Discrete}(G; \bth_y')$, where again $\bth_y' \in \bTh_{d_n}$.  When $\PP_{\QQ}$ is uniform on $\mc{Q}_n$, all shuffled graphs within the same isomorphism set are equally likely; that is  $\{\theta_{G_i|y}' = \theta_{G_j|y}' \, \forall G_i,G_j \colon \Qs(G_i)=G_j$ for some $\Qs \in \mc{Q}_n\}$.
+As in the labeled case, the shuffled graph class-conditional distributions $\PP_{\QQ(\GG)|y}$ can be represented by discrete distributions $\text{Discrete}(G; \bth_y')$, where again $\bth_y' \in \triangle_{d_n}$.  When $\PP_{\QQ}$ is uniform on $\mc{Q}_n$, all shuffled graphs within the same isomorphism set are equally likely; that is  $\{\theta_{G_i|y}' = \theta_{G_j|y}' \, \forall G_i,G_j \colon \Qs(G_i)=G_j$ for some $\Qs \in \mc{Q}_n\}$.
 
 
 \subsection{An unlabeled graph classification model} % (fold)
@@ -106,8 +106,8 @@ As in the labeled case, the shuffled graph class-conditional distributions $\PP_
 Let $\mt{\mc{G}}_n$ be the collection of isomorphism sets.
 An \emph{unlabeled graph} $\mt{G}$ is an element of $\mt{\mc{G}}_n$. The number of unlabeled graphs on $n$ vertices is $|\mt{\mc{G}}_n|=\mt{d}_n \approx d/n!$ (see \cite{oeis.org/A000088} and references therein).
 % , and $|\mt{\mc{G}}_n|=\mt{d}_n$.  
-A \emph{unlabeling function} $U\colon \mc{G}_n \to \mt{\mc{G}}_n$ is a function that takes as input a graph and outputs the corresponding unlabeled graph. Let $\mt{\GG}\colon \Omega \to \mt{\mc{G}}_n$ be a unlabeled graph-valued random variable taking values $\mt{G} \in \mt{\mc{G}}_n$.   The joint distribution over unlabeled graphs and classes is therefore
-$\PP_{\mt{\GG},Y}=\PP_{U(\GG),Y}=\PP_{U(\QQ(\GG)),Y}$, which decomposes as $\PP_{\mt{\GG}|Y} \pi_Y$. The class-conditional distributions $\PP_{\mt{\GG} | y}$ over isomorphism sets (unlabeled graphs) can also be thought of as discrete distributions $\text{Discrete}(\mt{G}; \mb{\mt{\theta}}_y)$ where $\mb{\mt{\theta}}_y\in \bTh_{\mt{d}_n}$ are $\mt{d}_n$-dimensional vectors.   Comparing shuffling and unlabeling for the independent and uniform shuffle distribution $\PP_{\QQ}$, we have $\{\theta_{G|y}'=\mt{\theta}_{\mt{G}|y}/|\mt{G}| \, \forall \colon G \in \mt{G}\}$.  
+An \emph{isomorphism function} $U\colon \mc{G}_n \to \mt{\mc{G}}_n$ is a function that takes as input a graph and outputs the corresponding unlabeled graph. Let $\mt{\GG}\colon \Omega \to \mt{\mc{G}}_n$ be an unlabeled graph-valued random variable taking values $\mt{G} \in \mt{\mc{G}}_n$.   The joint distribution over unlabeled graphs and classes is therefore
+$\PP_{\mt{\GG},Y}=\PP_{U(\GG),Y}=\PP_{U(\QQ(\GG)),Y}$, which decomposes as $\PP_{\mt{\GG}|Y} \pi_Y$. The class-conditional distributions $\PP_{\mt{\GG} | y}$ over isomorphism sets (unlabeled graphs) can also be thought of as discrete distributions $\text{Discrete}(\mt{G}; \mb{\mt{\theta}}_y)$ where $\mb{\mt{\theta}}_y\in \triangle_{\mt{d}_n}$ are vectors in the $\mt{d}_n$-dimensional unit simplex.   Comparing shuffling and unlabeling for the independent and uniform shuffle distribution $\PP_{\QQ}$, we have $\{\theta_{G|y}'=\mt{\theta}_{\mt{G}|y}/|\mt{G}|$ for all $G \in \mt{G}\}$.  
 
 
 
@@ -115,7 +115,7 @@ $\PP_{\mt{\GG},Y}=\PP_{U(\GG),Y}=\PP_{U(\QQ(\GG)),Y}$, which decomposes as $\PP_
 \section{Bayes Optimal Graph Classifiers} % (fold)
 \label{sec:bayes_optimal_graph_classifiers}
 
-We consider classification in the above three scenarios.  To proceed, in each scenario we define three mathematical objects: (i) a classifier, (ii) the Bayes optimal classifier, and (iii) the Bayes risk.
+We consider graph classification in the three scenarios described above: labeled, shuffled, and unlabeled.  To proceed, in each scenario we define three mathematical objects: (i) a classifier, (ii) the Bayes optimal classifier, and (iii) the Bayes risk.
 
 \subsection{Bayes Optimal Labeled Graph Classifiers} % (fold)
 \label{sub:labeled_graph_classifiers}
@@ -124,14 +124,14 @@ We consider classification in the above three scenarios.  To proceed, in each sc
 
 % \begin{itemize}
 	% \item 
-	A \emph{labeled graph classifier} $h\colon \mc{G}_n \to \mc{Y}$ is any function that maps from graph space to class space. The risk of a labeled graph classifier under $0-1$ loss is the expected misclassification rate $L(h)=\EE[h(\GG)\neq Y]$, where the expectation is taken against $\PP_{\GG,Y}$.
+	A \emph{labeled graph classifier} $h\colon \mc{G}_n \to \mc{Y}$ is any function that maps from labeled graph space to class space. The risk of a labeled graph classifier under $0-1$ loss is the expected misclassification rate $L(h)=\EE[h(\GG)\neq Y]$, where the expectation is taken against $\PP_{\GG,Y}$.
 	% \item  
 	
 	The \emph{labeled graph Bayes optimal classifier} is given by
 	\begin{align}
 		h_* = \argmin_{h \in \mc{H}} L(h),
 	\end{align}
-	where $\mc{H}$ is the set of possible graph classifiers.
+	where $\mc{H}$ is the set of possible labeled graph classifiers.
 	% \item 
 	
 	The \emph{labeled graph Bayes risk} is given by 
@@ -163,18 +163,18 @@ We consider classification in the above three scenarios.  To proceed, in each sc
 
 \subsection{Bayes Optimal Shuffled Graph Classifiers} % (fold)
 
-A \emph{shuffled graph classifier} is also any function $h\colon \mc{G}_n \to \mc{Y}$. However, by virtue of the input being a shuffled graph as opposed to a labeled graph, the shuffled risk under $0-1$ loss is given by $L'(h)=\EE[h(\QQ(\GG)) \neq Y]$, where the expectation is taken against $\PP_{\QQ(\GG),Y}$. %As above, 
+A \emph{shuffled graph classifier} is also any function $h\colon \mc{G}_n \to \mc{Y}$ XXX: (note that the set of shuffled graphs is the same as the set of labeled graphs):XXX. However, by virtue of the input being a shuffled graph as opposed to a labeled graph, the shuffled risk under $0-1$ loss is given by $L'(h)=\EE[h(\QQ(\GG)) \neq Y]$, where the expectation is taken against $\PP_{\QQ(\GG),Y}$. %As above, 
 % \begin{align}
 % h'_*=\argmin_{h \in \mc{H}} L'(h).	
 % \end{align}
 % The \emph{shuffled Bayes risk}, $L'_*=L'(h'_*)$, depends on $\PP_{\QQ,\GG,Y}$.
 % \defa
 
-The \emph{shuffled graph Bayes optimal graph classifier} is given by
+The \emph{shuffled graph Bayes optimal classifier} is given by
 \begin{align}
-	h_*' &= \argmin_{h \in \mc{H}} L'(h). %, \qquad %\\
+	h_*' &= \argmin_{h \in \mc{H}} L'(h), %, \qquad %\\
 \end{align}
-The \emph{shuffled Bayes risk} is given by
+XXX:where $\mc{H}$ is again the set of possible labeled (or shuffled) graph classifiers.:XXX The \emph{shuffled Bayes risk} is given by
 \begin{align}
 	% h_*' &= \argmin_{h \in \mc{H}} L'(h), \qquad %\\
 	L_*' =\min_{h \in \mc{H}} L'(h),
@@ -217,11 +217,11 @@ and $\mt{L}_*$ implicitly depends on $\PP_{\mt{\GG},Y}$.
 
 % subsection parametric_classifiers (end)
 
-The three Bayes graph classifiers can be written explicitly in terms of their model parameters:
+The three Bayes optimal graph classifiers can be written explicitly in terms of their model parameters:
 \begin{align}
-	h_* &= \argmax_{y \in \mc{Y}} \theta_{G|y}\pi_y, \\
-	h_*' &= \argmax_{y \in \mc{Y}} \theta_{G|y}' \pi_y, \\
-	\mt{h}_* &= \argmax_{y \in \mc{Y}}  \mt{\theta}_{\mt{G}|y}\pi_y. \label{eq:unbayes2}
+	h_*(G) &= \argmax_{y \in \mc{Y}} \theta_{G|y}\pi_y, \\
+	h_*'(G) &= \argmax_{y \in \mc{Y}} \theta_{G|y}' \pi_y, \\
+	\mt{h}_*(\mt{G}) &= \argmax_{y \in \mc{Y}}  \mt{\theta}_{\mt{G}|y}\pi_y. \label{eq:unbayes2}
 \end{align}
 
 
@@ -236,14 +236,14 @@ The three Bayes graph classifiers can be written explicitly in terms of their mo
 
 
 
-The result of either shuffling or unlabeling a graph can only degrade, but not improve Bayes risk.  This is a restatement of the data processing lemma for this scenario. Specifically, \cite{DEV96} shows that the data processing lemma indicates that in the classification domain, $L^*_X \leq L^*_{T(X)}$, for any statistic $T$ and data $X$.  In our setting, this becomes:
+The result of either shuffling or unlabeling a graph can only degrade, but not improve Bayes risk.  This is a restatement of the data processing lemma for this scenario. Specifically, \cite{DEV96} shows that the data processing lemma indicates that in the classification domain $L^*_X \leq L^*_{T(X)}$ for any transformation $T$ and data $X$.  In our setting, this becomes:
 
 \begin{thm} \label{thm:1}
 $L_* \leq \mt{L}_*=L_*'$.
 \end{thm}
 
 \begin{proof}
-	Assume $|\mc{Y}|=2$ and $\pi_0=\pi_1=1/2$.  
+	Assume for simplicity $|\mc{Y}|=2$ and $\pi_0=\pi_1=1/2$.  
 \begin{align} \label{eq:thm1}
 	\mt{L}_*&=\sum_{\mt{G} \in \mt{\mc{G}}_n} \min_y  \mt{\theta}_{\mt{G}|y}  
 	=\sum_{\mt{G} \in \mt{\mc{G}}_n} \min_y  \sum_{G \in \mt{G}}\theta_{G|y}'  = L_*' \nonumber \\
@@ -256,7 +256,7 @@ $L_* \leq \mt{L}_*=L_*'$.
 
 
 
-An immediate consequence of the above proof is that the inequality in the statement of Theorem \ref{thm:1} strict whenever the inequality in Eq. \ref{eq:thm1} is strict:
+An immediate consequence of the above proof is that the inequality in the statement of Theorem \ref{thm:1} strict whenever the inequality in Eq. \eqref{eq:thm1} is strict:
 
 \begin{thm}
 	$L_* < \mt{L}_*=L'_*$ if and only if there exists $\mt{G}$ such that
@@ -264,20 +264,19 @@ An immediate consequence of the above proof is that the inequality in the statem
 	$$\min_y \mt{\theta}_{\mt{G}|y} > \sum_{G \in \mt{G}}\min_y \theta_{G|y}.$$
 \end{thm}
 The above result demonstrates that even when the labels \emph{do} carry some class-conditional signal, it may be the case that shuffling or unlabeling does not degrade performance.  In other words, to state that labels contain information is equivalent to stating that some graphs within an isomorphism set are class-conditionally more likely than others: $\exists \, \theta_{G_i|y} \neq \theta_{G_j|y}$ where $\Qs(G_i)=G_j$ for some $G_i,G_j \in \mc{G}_n$, $\Qs \in \mc{Q}_n$, and $y \in \mc{Y}$%, and that $\theta_{G_i|y}\neq \theta_{G_i|y'}$ or $\theta_{G_j|y}\neq \theta_{G_j|y'}$
-.  Shuffling has the effect of ``flattening'' likelihoods within isomorphism sets, from $\bth_y$ to $\bth_y'$, so that $\bth_y'$ satisfies $\{\theta_{G|y}'=\mt{\theta}_{\mt{G}|y}/|\mt{G}| \, \forall \colon G \in \mt{G}\}$.  But just because the shuffling changes class-conditional likelihoods does \emph{not} mean that Bayes risk must also change. This result follows immediately upon realizing that posteriors can change without classification performance changing.  The above results hold in the absence of equal priors, and are easily generalized to  $c$-class classification problems.  To see this, ignoring ties, simply replace each minimum with a sum over all non-maxima: 
+.  Shuffling has the effect of ``flattening'' likelihoods within isomorphism sets, from $\bth_y$ to $\bth_y'$, so that $\bth_y'$ satisfies $\{\theta_{G|y}'=\mt{\theta}_{\mt{G}|y}/|\mt{G}| \, \forall \colon G \in \mt{G}\}$.  But just because the shuffling changes class-conditional likelihoods does \emph{not} mean that Bayes risk must also change. This result follows immediately upon realizing that posteriors can change without classification performance changing.  The above results are easily extended to consider non-equal priors and $c$-class classification problems.  To see this, ignoring ties, simply replace each minimum likelihod with a sum over all non-maximum posteriors: 
 % $$\min_y \PP_y(G) \to \sum_{y \in \mc{Y}'} \PP_y(G) \text{ where } \mc{Y}' =\{y : y \neq \argmax_y \PP_y\}.$$
-$$\min_y \theta_{G|y} \to \sum_{y \in \mc{Y}'} \theta_{G|y} \text{ where } \mc{Y}' =\{y \colon y \neq \argmax_y \theta_{G|y}\}.$$
+$$\min_y \theta_{G|y} \pi_y \mapsto \sum_{y \in \mc{Y}'} \theta_{G|y} \pi_y \text{ where } \mc{Y}' =\{y \colon y \neq \argmax_y \theta_{G|y}\}.$$
 
 
-
-\section{Bayes Optimal Graph Invariant-Based Classification After Shuffling} % (fold)
+\section{Bayes Optimal Graph Invariant Classification After Shuffling} % (fold)
 \label{sec:gi}
 
-A graph invariant on $\mc{G}_n$ is any function $\psi$  such that $\psi(G)=\psi(\Qs(G))$ for all $G \in \mc{G}_n$ and $\Qs \in \mc{Q}_n$.  A graph invariant based classifier is a composition of a vector-based classifier with an invariant function, $h^\psi=f^\psi \circ \psi$, where $f^\psi\colon \Real^{d'} \to \mc{Y}$.  The Bayes optimal graph invariant classifier minimizes risk over all invariants: 
+A graph invariant on $\mc{G}_n$ is any function $\psi$  such that $\psi(G)=\psi(\Qs(G))$ for all $G \in \mc{G}_n$ and $\Qs \in \mc{Q}_n$.  A graph invariant classifier is a composition of a classifier with an invariant function, $h^\psi=f^\psi \circ \psi$.  The Bayes optimal graph invariant classifier minimizes risk over all invariants: 
 \begin{align} \label{eq:psi}
 	h_*^{\psi}=\argmin_{\psi \in \Psi, f^{\psi} \in \mc{F}^{\psi}} \EE[f(\psi(\GG))\neq Y],
 \end{align}
-where $\Psi$ is the space of all possible invariants and $\mc{F}^{\psi}$ is the space of classifiers using invariant $\psi$. The expectation in Eq. \eqref{eq:psi} is taken against $\PP_{\GG,Y}$ or equivalently $\PP_{\QQ(\GG),Y}$, since invariants are invariant.
+where $\Psi$ is the space of all possible invariants and $\mc{F}^{\psi}$ is the space of classifiers composable XXX: composable is not a word according to my dictionary:XXX with invariant $\psi$. The expectation in Eq. \eqref{eq:psi} is taken against $\PP_{\GG,Y}$ or equivalently $\PP_{\QQ(\GG),Y}$, since invariants are invariant.
   Let $L_*^{\psi}$ denote the Bayes invariant risk.  
 \begin{thm}
 	$\mt{L}_*=L_*^\psi$.
@@ -287,14 +286,14 @@ where $\Psi$ is the space of all possible invariants and $\mc{F}^{\psi}$ is the 
 Let $\psi$ indicate in which equivalence set $G$ resides; that is,  $\psi(G)=\mt{G}$ if and only if $G \in \mt{G}$.  Then
 % $f_{G'}(G)$ be a graph matching function; that is, $f\colon \mc{G}_n \times \mc{G}_n \to \{0,1\}$, taking value unity whenever $G$ and $G'$ are isomorphic to one another.  Let $\psi(G)=\mb{f}(G)$, where $\mb{f}=(f_{G_1}, \ldots, f_{G_{\mt{d}}})$.  In words, $\phi(G)$ outputs a vector of length $\mt{d}_n$ with a single non-zero entry in the isomorphism set of $G$.  Let $h^{\psi}$ be an indicator function for the maximum a posteriori class of the corresponding isomorphism set. For instance, if $G \in \mt{G}_j$, then
 \begin{align}
-	h^{\psi}_*= \argmax_{y \in \mc{Y}} \mt{\theta}_{\psi(G)|y} \pi_y = \argmax_{y \in \mc{Y}} \mt{\theta}_{\mt{G}|y} \pi_y = \mt{h}_*.
+	h^{\psi}_*(G)= \argmax_{y \in \mc{Y}} \mt{\theta}_{\psi(G)|y} \pi_y = \argmax_{y \in \mc{Y}} \mt{\theta}_{\mt{G}|y} \pi_y = \mt{h}_*(G).
 \end{align}
 % Thus, this graph invariant based classifier is the unlabeled Bayes optimal classifier.
 \end{proof}
 
 
 
-\section{A consistent and efficient unshuffling-based classifier} % (fold)
+\section{A consistent and efficient unshuffling classifier} % (fold)
 \label{sec:bayes_optimal_graph_invariant_based_classifier}
 
 
@@ -302,16 +301,16 @@ Section \ref{sec:shuffle} shows that one cannot fruitfully ``unshuffle'' graphs:
 
 An unlabeled graph Bayes \emph{plugin} classifier estimates the likelihood and prior terms and plugs them in to Eq. \eqref{eq:unbayes2}:
 \begin{align} \label{eq:class}
-	\mh{h}_s=\argmax_{y\in\mc{Y}} \mh{\mt{\theta}}_{\mt{G}|y}\mh{\pi}_y. %, \text{ where } G\in \mt{G}_j.
+	\mh{h}_s(\mt{G})=\argmax_{y\in\mc{Y}} \mh{\mt{\theta}}_{\mt{G}|y}\mh{\pi}_y. %, \text{ where } G\in \mt{G}_j.
 \end{align}
-Let $\mh{L}_s=L(\mh{h}_s)$ be the risk of the induced classifier. 
+Let $\mh{L}_s=L(\mh{h}_s)$ be the risk of the induced classifier using the maximum likelihood to obtain the plugin estimate for Eq. \eqref{eq:class}. 
 
 \begin{thm} \label{thm:conv}
 	$\mh{L}_s \conv \mt{L}^*$ as $s \conv \infty$.
 \end{thm}
 
 \begin{proof}
-Because $\mt{\mc{G}}_n$ and $\mc{Y}$ are both finite, their respective maximum likelihood estimates are guaranteed consistent by the law of large numbers.  Hence,  the Bayes plugin classifier is also consistent \cite{DEV96}.  %Formally, if $\mhb{\mt{\theta}} \conv \mb{\mt{\theta}}$ and $\mhb{\pi} \conv \mb{\pi}$ as $s \conv \infty$, then $\mh{L}_s \conv \mt{L}_*$ as $s\conv \infty$.  
+Because $\mt{\mc{G}}_n$ and $\mc{Y}$ are both finite, their respective maximum likelihood estimates are guaranteed consistent by the law of large numbers.  Hence,  the unlabeled graph Bayes plugin classifier is also consistent to $\mt{L}_*$ \cite{DEV96}.  %Formally, if $\mhb{\mt{\theta}} \conv \mb{\mt{\theta}}$ and $\mhb{\pi} \conv \mb{\pi}$ as $s \conv \infty$, then $\mh{L}_s \conv \mt{L}_*$ as $s\conv \infty$.  
 % Thus, $\mh{h}_s \conv \mt{h}^*$ as $s \conv \infty$.
 \end{proof}
 
@@ -321,17 +320,17 @@ Because $\mt{\mc{G}}_n$ and $\mc{Y}$ are both finite, their respective maximum l
 \section{A Practical Approach to Shuffled Graph Classification} % (fold)
 \label{sec:a_practical_approach_to_unlabeled_graph_classification}
 
-Although Eq. \ref{eq:class} yields consistency from Theorem \ref{thm:conv}, utilizing this is practically hopeless as it requires solving $s$ computationally difficult problems, and acceptable performance will  typically require $s \gg \mt{d}_n$.  Specifically, using Eq. \ref{eq:class} requires first enumerating  all $\mt{d}_n$ isomorphism sets, then determining in which isomorphism set the to-be-classifier graph and each of the training graphs resides. There are no known polynomial time solvers for graph isomorphism.    This approach is therefore, in general, impractical on two levels: (i) the number of parameters to estimate, $\mt{d}_n$, is too large and (ii) exact graph isomorphism is too computationally taxing.  We therefore consider a modified approach.
+Although Eq. \eqref{eq:class} yields consistency from Theorem \ref{thm:conv}, utilizing this is practically hopeless as it requires solving $s$ computationally difficult graph isomorphism problems, and acceptable performance will  typically require $s \gg \mt{d}_n$.  Specifically, using Eq. \eqref{eq:class} requires first enumerating  all $\mt{d}_n$ isomorphism sets, then determining in which isomorphism set the to-be-classified graph and each of the training graphs resides. There are no known polynomial time solvers for graph isomorphism.    This approach is therefore, in general, impractical on two levels: (i) the number of parameters to estimate, $\mt{d}_n$, is too large, and (ii) exact graph isomorphism is too computationally taxing.  We therefore consider a modified approach.
 
 A $k_s$ nearest-neighbor ($k$NN) classifier 
 using  Frobenius norm 
-is universally consistent for labeled graph classification as long as $k_s \conv \infty$ with $k_s/s \conv 0$ as $s \conv \infty$ \cite{VP11super}. This non-parametric approach circumvents the need to estimate $\mt{d}_n$ parameters. 
-We use a graph-matched Frobenius norm as the distance function, 
+is universally consistent to $L_*$ for labeled graph classification as long as $k_s \conv \infty$ with $k_s/s \conv 0$ as $s \conv \infty$ \cite{VP09_super}. This non-parametric approach circumvents the need to estimate $\mt{d}_n$ parameters. 
+For shuffled graphs, we use a graph-matched Frobenius norm as the distance function, 
 \begin{align} \label{eq:d}
 \delta(G_i,G_j)=\argmin_{Q \in \mc{Q}_n}\norm{Q(G_i)-G_j}_F^2.	
 \end{align}
 Eq. \eqref{eq:d} requires solving a graph matching problem, which is NP-hard.  Therefore, we instead use an inexact graph matching approach based on the quadratic assignment formulation described in \cite{VP11QAP}, which is only cubic in $n$. % This strategy is only cubic instead of super-exponential in $n$.  
-Note that while the $k$NN approach with exact matching maintains universal consistency, $k$NN with inexact graph matching approximation may not be consistent.  
+Note that while the $k$NN approach with exact matching maintains universal consistency to $L_*'$, $k$NN with inexact graph matching approximation may not be consistent.  
 
 The $k$NN classifier for shuffled graphs proceeds as follows.  First, compute the graph-matched Frobenius norm distance between the test graph and all training graphs, $\{\delta_i=\delta(G,G_i)\}_{i \in [s]}$.  Second, order the graph/class pairs according to their distances, $\delta_{(1)} \leq \cdots \leq \delta_{(s)}$.  Finally, let the estimated class be the plurality class of the $k_s$ closest graphs; that is, $\mh{y}=\argmax_{y \in \mc{Y}} \sum_{i \in [k_s]} \II\{y_{(i)}=y\}$.   
 

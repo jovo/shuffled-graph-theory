@@ -4,7 +4,7 @@ clear; clc
 n_tst= 500;                           % # of samples
 n   = 10;                           % # of vertices
 alg.model = 'bern';
-fname   = 'BLSA0317_sigsub';    % different names will generate different simulations
+fname   = 'hetero_easy';    % different names will generate different simulations
 
 alg.fname   = [fname '_n' num2str(n) '_MC' num2str(n_tst)];
 switch fname                    % choose simulation parameters

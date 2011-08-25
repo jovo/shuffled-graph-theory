@@ -1,0 +1,103 @@
+%% test QAP+KNN vs # samples
+%
+% 1. load data
+% 2. binarize
+% 3. generate synthetic data
+% 4. knn classify labeled graphs and plot results
+% 5. shuffle graphs
+% 6. try to unshuffle using QAP
+% 7. knn classify unlabeled graphs and plot results
+
+
+%% 1. load data
+
+clear, clc
+load('~/Research/data/MRI/BLSA/BLSA_0317/base/BLSA_0317_countMtx.mat')
+
+%% 2. binarize
+
+t=200;
+siz=size(AdjMats);
+n=siz(1);
+s=siz(3);
+Awei=0*AdjMats;
+idu=find(triu(ones(n),+1));
+for i=1:s
+    A=(AdjMats(:,:,i));
+    A(idu)=0;
+    Awei(:,:,i)=A;
+end
+Abin=Awei;
+Abin(Abin<=t)=0;
+Abin(Abin>t)=1;
+
+%% 3. generate synthetic data
+
+const=get_constants(Abin,ClassIDs);
+P=get_ind_edge_params(Abin,const);
+
+% (testing using non-synthetic data to make sure code works)
+n=10;
+nmc=500;
+P.E0=rand(n)*0.7;   % params in class 0
+P.E1=P.E0+0.3;      % params in class 1
+
+[Gs_La Ys P_syn] = generate_synthetic_data(P,ClassIDs,nmc);
+
+%% 4. knn classify labeled graphs and plot results
+
+kvec = 1:100;
+
+IDM = InterpointDistanceMatrix(Gs_La);
+
+[Lhat yhat] = knnclassifyIDM(IDM,Ys,kvec);
+
+% plot synthetic data
+figure(1), clf
+subplot(311), imagesc(P_syn.E0-P.E0), colorbar
+subplot(312), imagesc(P_syn.E1-P.E1), colorbar
+subplot(313), plot(Lhat)
+
+%% 5. shuffle graphs
+
+Gs_Sh=0*Gs_La;
+for i=1:s
+    q=randperm(n);
+    A=Gs_La(:,:,i);
+    Gs_Sh(:,:,i)=A(q,q);
+end
+
+%% 6. try to unshuffle using QAP
+
+Gs_Unshuffled=0*Gs_Sh;
+myp=nan(n,nmc);
+
+y0proto=find(Ys==0,1);
+y1proto=find(Ys==1,1);
+
+parfor i=1:nmc
+    if mod(i,10)==0, disp(['10 more unshufflings done our of ', nmc]), end
+    if Ys(i)==1
+        [~, myp(:,i)]=sfw(-Gs_Sh(:,:,i),Gs_Sh(:,:,y1proto)',15);
+    else
+        [~, myp(:,i)]=sfw(-Gs_Sh(:,:,i),Gs_Sh(:,:,y0proto)',15);
+    end
+    Gs_Unshuffled(:,:,i)=Gs_Sh(myp(:,i),myp(:,i),i);
+end
+
+%% 7. knn clasify unlabeled graphs
+
+IDM = InterpointDistanceMatrix(Gs_Sh);
+
+[Lhat_shuffled] = knnclassifyIDM(IDM,Ys,kvec);
+
+subplot(313), hold all, plot(Lhat_shuffled)
+
+%% 8. naive bayes plugin unlabeled graphs
+
+const_Un=get_constants(Gs_Un,Ys);
+Phat_Un=get_ind_edge_params(Gs_Un,const_Un);
+
+[Lhat_NB] = naive_bayes_classify(Gs_Un,Ys,Phat_Un)
+
+

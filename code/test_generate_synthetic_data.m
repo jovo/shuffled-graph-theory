@@ -31,21 +31,41 @@ Abin=Awei;
 Abin(Abin<=t)=0;
 Abin(Abin>t)=1;
 
-%% 3. generate synthetic data
+%% 3. select/generate data
 
-const=get_constants(Abin,ClassIDs);
-P=get_ind_edge_params(Abin,const,'mle');
+datatype='weighted';
 
-Ns=100;
-% P.E0 = mean(Abin,3);
-% P.E1 = mean(P.E0+P.E0')*ones(Nvertices);
+if strcmp(datatype,'synthetic') 
+    const=get_constants(Abin,ClassIDs);
+    P=get_ind_edge_params(Abin,const,'mle');
+    
+    Ns=100;
+    P.E0 = mean(Abin,3);
+    E0=P.E0+P.E0';
+    P.E1 = mean(E0(:))*tril(ones(Nvertices),-1);
+    
+    % % (testing using non-synthetic data to make sure code works)
+    % Nvertices=10;
+    % P.E0=rand(Nvertices)*0.7;   % params in class 0
+    % P.E1=P.E0+0.3;              % params in class 1
+    
+    [Gs_La Ys P_syn] = generate_synthetic_data(P,ClassIDs,Ns);
+    
+    % plot synthetic data
+    figure(2), clf
+    subplot(211), imagesc(P_syn.E0-P.E0), colorbar
+    subplot(212), imagesc(P_syn.E1-P.E1), colorbar
+    
+elseif strcmp(datatype,'weighted')  
+    Gs_La=Awei;
+    Ys=ClassIDs';
+    Ns=length(Ys);
+elseif strcmp(datatype,'binary')  
+    Gs_La=Abin;
+    Ys=ClassIDs';
+    Ns=length(Ys);    
+end
 
-% % (testing using non-synthetic data to make sure code works)
-% Nvertices=10;
-% P.E0=rand(Nvertices)*0.7;   % params in class 0
-% P.E1=P.E0+0.3;              % params in class 1
-
-[Gs_La Ys P_syn] = generate_synthetic_data(P,ClassIDs,Ns);
 
 %% 4. knn classify labeled graphs and plot results
 
@@ -55,11 +75,7 @@ IDM = InterpointDistanceMatrix(Gs_La);
 
 [Lhat yhat] = knnclassifyIDM(IDM,Ys,kvec);
 
-% plot synthetic data
-figure(1), clf
-subplot(311), imagesc(P_syn.E0-P.E0), colorbar
-subplot(312), imagesc(P_syn.E1-P.E1), colorbar
-subplot(313), plot(Lhat,'k')
+figure(1), clf, plot(Lhat,'k')
 
 %% 5. shuffle graphs
 
@@ -71,6 +87,7 @@ for i=1:Ns
     Gs_Sh(:,:,i)=A(q,q);
 end
 
+if any(Gs_Sh>1), err('something is horrible'), end
 
 %% 6. try to unshuffle using QAP
 
@@ -81,7 +98,7 @@ y0proto=find(Ys==0,1);
 y1proto=find(Ys==1,1);
 
 parfor i=1:Ns
-    if mod(i,10)==0, disp(['10 more unshufflings done our of ', Ns]), end
+    if mod(i,10)==0, disp(['10 more unshufflings done our of ', num2str(Ns)]), end
     if Ys(i)==1
         [~, myp(:,i)]=sfw(-Gs_Sh(:,:,i),Gs_Sh(:,:,y1proto)',15);
     else
@@ -96,39 +113,47 @@ IDM = InterpointDistanceMatrix(Gs_Un);
 
 [Lhat_shuffled] = knnclassifyIDM(IDM,Ys,kvec);
 
-subplot(313), hold all, plot(Lhat_shuffled,'b')
+figure(1), hold all, plot(Lhat_shuffled,'b')
 
 %% 8. naive bayes plugin unlabeled graphs
 
-Phat=get_ind_edge_params(Gs_Un,Ys);
-
-Ntst=1000;
-[Gtst_La Ytst] = generate_synthetic_data(P,ClassIDs,Ntst);
-
-
-Gtst_Sh=0*Gtst_La;
-for i=1:Ntst
-    q=randperm(Nvertices);
-    A=Gtst_La(:,:,i);
-    A=A+A';
-    Gtst_Sh(:,:,i)=A(q,q);
+if strcmp(datatype,'true')
+    
+    Phat=get_ind_edge_params(Gs_Un,Ys);
+    
+    Ntst=Ns;
+    [Gtst_La Ytst] = generate_synthetic_data(P,ClassIDs,Ntst);
+    
+    
+    Gtst_Sh=0*Gtst_La;
+    for i=1:Ntst
+        q=randperm(Nvertices);
+        A=Gtst_La(:,:,i);
+        A=A+A';
+        Gtst_Sh(:,:,i)=A(q,q);
+    end
+    
+    Ytst_hat=nan(Ntst,1);
+    parfor i=1:Ntst
+        [~, myp0]=sfw(-Gtst_Sh(:,:,i),Gs_Un(:,:,y0proto)',15);
+        Utst0=Gtst_Sh(myp0,myp0,i);
+        
+        [~, myp1]=sfw(-Gtst_Sh(:,:,i),Gs_Un(:,:,y1proto)',15);
+        Utst1=Gtst_Sh(myp1,myp1,i);
+        
+        
+        post0=sum(Utst0(:).*Phat.lnE0(:)+(1-Utst0(:)).*Phat.ln1E0(:))+Phat.lnprior0;
+        post1=sum(Utst1(:).*Phat.lnE1(:)+(1-Utst1(:)).*Phat.ln1E1(:))+Phat.lnprior1;
+        
+        [~, bar] = sort([post0, post1]); % find the bigger one
+        Ytst_hat(i)=bar(2)-1;
+    end
+    Lhat_NB = sum(Ytst_hat~=Ytst)/length(Ytst);
+    
+    disp(['naive bayes performance is: ', num2str(Lhat_NB)])
+    
 end
 
-Ytst_hat=nan(Ntst,1);
-parfor i=1:Ntst
-    [~, myp0]=sfw(-Gtst_Sh(:,:,i),Gs_Un(:,:,y0proto)',15);
-    Utst0=Gtst_Sh(myp0,myp0,i);
-    
-    [~, myp1]=sfw(-Gtst_Sh(:,:,i),Gs_Un(:,:,y1proto)',15);
-    Utst1=Gtst_Sh(myp1,myp1,i);
-    
-    
-    post0=sum(Utst0(:).*Phat.lnE0(:)+(1-Utst0(:)).*Phat.ln1E0(:))+Phat.lnprior0;
-    post1=sum(Utst1(:).*Phat.lnE1(:)+(1-Utst1(:)).*Phat.ln1E1(:))+Phat.lnprior1;
-    
-    [~, bar] = sort([post0, post1]); % find the bigger one
-    Ytst_hat(i)=bar(2)-1;
-end
-Lhat_NB = sum(Ytst_hat~=Ytst)/length(Ytst);
+%% 9. save stuff
 
-disp(['naive bayes performance is: ', Lhat_NB])
+save(['../data/', datatype, '_classification'])

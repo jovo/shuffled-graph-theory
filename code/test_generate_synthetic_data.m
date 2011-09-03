@@ -19,10 +19,10 @@ load('~/Research/data/MRI/BLSA/BLSA_0317/base/BLSA_0317_countMtx.mat')
 t=200;
 siz=size(AdjMats);
 Nvertices=siz(1);
-s=siz(3);
+Ns=siz(3);
 Awei=0*AdjMats;
 idu=find(triu(ones(Nvertices),+1));
-for i=1:s
+for i=1:Ns
     A=(AdjMats(:,:,i));
     A(idu)=0;
     Awei(:,:,i)=A;
@@ -33,9 +33,9 @@ Abin(Abin>t)=1;
 
 %% 3. select/generate data
 
-datatype='weighted';
+datatype='binary';
 
-if strcmp(datatype,'synthetic') 
+if strcmp(datatype,'synthetic')
     const=get_constants(Abin,ClassIDs);
     P=get_ind_edge_params(Abin,const,'mle');
     
@@ -56,14 +56,14 @@ if strcmp(datatype,'synthetic')
     subplot(211), imagesc(P_syn.E0-P.E0), colorbar
     subplot(212), imagesc(P_syn.E1-P.E1), colorbar
     
-elseif strcmp(datatype,'weighted')  
+elseif strcmp(datatype,'weighted')
     Gs_La=Awei;
     Ys=ClassIDs';
     Ns=length(Ys);
-elseif strcmp(datatype,'binary')  
+elseif strcmp(datatype,'binary')
     Gs_La=Abin;
     Ys=ClassIDs';
-    Ns=length(Ys);    
+    Ns=length(Ys);
 end
 
 
@@ -71,11 +71,11 @@ end
 
 kvec = 1:round(Ns*0.9);
 
-IDM = InterpointDistanceMatrix(Gs_La);
+labeledIDM = InterpointDistanceMatrix(Gs_La);
 
-[Lhat yhat] = knnclassifyIDM(IDM,Ys,kvec);
+[Lhat yhat] = knnclassifyIDM(labeledIDM,Ys,kvec);
 
-figure(1), clf, plot(Lhat,'k')
+figure(1), clf, plot(Lhat), hold all
 
 %% 5. shuffle graphs
 
@@ -87,35 +87,50 @@ for i=1:Ns
     Gs_Sh(:,:,i)=A(q,q);
 end
 
-if any(Gs_Sh>1), err('something is horrible'), end
+% if any(Gs_Sh>1), err('something is horrible'), end
 
-%% 6. try to unshuffle using QAP
+%% 6. compute unlabeled interpoint distance matrix
 
-Gs_Un=0*Gs_Sh;
-myp=nan(Nvertices,Ns);
+disp('Computing Interpoint-Distance-Matrix...')
 
-y0proto=find(Ys==0,1);
-y1proto=find(Ys==1,1);
 
-parfor i=1:Ns
-    if mod(i,10)==0, disp(['10 more unshufflings done our of ', num2str(Ns)]), end
-    if Ys(i)==1
-        [~, myp(:,i)]=sfw(-Gs_Sh(:,:,i),Gs_Sh(:,:,y1proto)',15);
-    else
-        [~, myp(:,i)]=sfw(-Gs_Sh(:,:,i),Gs_Sh(:,:,y0proto)',15);
+% compute distances
+% d=zeros(Ns);
+% f=zeros(Ns	 
+for i=1:Ns
+    
+    if mod(i,10)==0, disp('did another 10 rows of the IDM'); end
+    
+    parfor j=1:i %1:Ns
+        disp('did another 10 elements of the IDM')
+        [f(i,j), myp]=sfw(-Gs_Sh(:,:,i),Gs_Sh(:,:,j)',15);
+        d(i,j)=sum(sum((Gs_Sh(myp,myp,i)-Gs_Sh(:,:,j)).^2));
     end
-    Gs_Un(:,:,i)=Gs_Sh(myp(:,i),myp(:,i),i);
 end
 
 %% 7. knn clasify unshuffled graphs
 
-IDM = InterpointDistanceMatrix(Gs_Un);
+IDMd=d'+d;
+IDMd(1:Ns+1:end)=inf;
+[Lhatd_shuffled] = knnclassifyIDM(IDMd,Ys,kvec);
 
-[Lhat_shuffled] = knnclassifyIDM(IDM,Ys,kvec);
+IDMf=-f'-f;
+IDMf(1:Ns+1:end)=inf;
+[Lhatf_shuffled] = knnclassifyIDM(IDMf,Ys,kvec);
 
-figure(1), hold all, plot(Lhat_shuffled,'b')
+% plot(Lhatf_shuffled), 
+plot(Lhatd_shuffled)
+xlabel('k')
+ylabel('misclassification rate')
+
+legend('labeled','unshuffled')
+print('-dpng','../figs/knn_Lhats')
+
 
 %% 8. naive bayes plugin unlabeled graphs
+
+save(['../data/', datatype, '_classification'])
+
 
 if strcmp(datatype,'true')
     

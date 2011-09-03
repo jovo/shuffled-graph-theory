@@ -102,9 +102,9 @@ denoised=datum*Vs2;
 %% compare unweighted graphs
 clear yhat, 
 clear Lhat
-kmax=round(s/2)-1;
-algs=[1 5 7 8 9 10]; %1:10;
-for alg=algs
+kmax=48; %round(s/2)-1;
+nAlgs=10;
+for alg=1:nAlgs
     
     switch alg
         case 1
@@ -157,15 +157,15 @@ for alg=algs
 end
 
 
-%% plot stuff
+% plot stuff
 figure(2), clf, hold all
 ls{1}='-.';
 ls{2}='--';
 ls{3}='-';
 ls{4}=':';
 
-for alg=algs
+for alg=1:nAlgs
     plot([1:24]+rand-0.5,Lhat{alg},ls{mod(alg,3)+1}) %,'-','color',color(alg))
 end
 grid on
-legend('Ab','Binvars','invars_c','invars_c(4)','invars-4','Binvars-4','location','best')
+legend('Ab','Aw','BWinv','denoised','Binvars','Winvars','invars_c','invars_c(4)','invars-4','Binvars-4','location','best')

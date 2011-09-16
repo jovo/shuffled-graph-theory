@@ -108,6 +108,31 @@ for i=1:Ns
     end
 end
 
+%% QAP but starting with truth
+
+d2=nan(Ns);
+f=nan(Ns);
+for i=1:Ns
+    
+    if mod(i,10)==0, disp('did another 10 rows of the IDM'); end
+    
+    parfor j=i+1:Ns
+        if mod(j,10)==0, disp('did another 10 elements of the IDM'); end
+
+        [f(i,j), myp]=sfw(-Gs_La(:,:,i),Gs_La(:,:,j)',15);
+        d2(i,j)=sum(sum((Gs_La(myp,myp,i)-Gs_La(:,:,j)).^2));
+    end
+end
+d2=d2+d2';
+csvwrite('../data/QAPedIDM.csv',d2)
+
+
+
+
+
+
+
+
 %% 7. knn clasify unshuffled graphs
 
 IDMd=d'+d;

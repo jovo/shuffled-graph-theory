@@ -21,7 +21,7 @@ for i=1:s
     
     parfor j=i+1:s
         if ndims(data)==2
-            d(i,j)=sum((data(i,:)-data(j,:)).^2);
+            d(i,j)=sum((data(:,i)-data(:,j)).^2);
         else
             d(i,j)=sum(sum((data(:,:,i)-data(:,:,j)).^2));
         end

@@ -341,7 +341,7 @@ A $k_s$ nearest-neighbor classifier
 using Euclidean norm distance
 is universally consistent to $L_*$ for vector-valued data 
 % labeled graph classification 
-as long as $k_s \conv \infty$ with $k_s/s \conv 0$ as $s \conv \infty$ \cite{Stone1977}. This non-parametric approach circumvents the need to estimate many parameters in high-dimensional settings such as graph-classification. \cite{VP11_super} extended this proof to the graph domain, which we include here for completeness.  Specifically, to compare labeled graphs, they considered a Frobenius norm distance
+as long as $k_s \conv \infty$ with $k_s/s \conv 0$ as $s \conv \infty$ \cite{Stone1977}. This non-parametric approach circumvents the need to estimate many parameters in high-dimensional settings such as graph-classification. This result was extended to graph-valued data in \cite{VP11_super}, which we include here for completeness.   Specifically, to compare labeled graphs, they considered a Frobenius norm distance
 \begin{align}
 	\delta(G_i,G_j)=\norm{A_i-A_j}_F^2,
 \end{align}
@@ -358,7 +358,7 @@ Let $\mh{L}_{k_sNN}'$ indicate the misclassification rate of the Frobenius-norm 
 \end{coro}
 The number of unlabeled graphs is vastly less than the number of labeled or shuffled graphs, $|\mc{G}'| \approx |\mc{G}|/n!$.  Therefore, given that we observed only labeled or shuffled graphs, but not unlabeled graphs, we consider the ``graph-matched Frobenius norm'' distance
 \begin{align} \label{eq:d}
-\delta'(G_i,G_j)=\argmin_{Q \in \mc{Q}_n}\norm{Q(G_i)-G_j}_F^2.	
+\delta'(G_i,G_j)=\min_{Q \in \mc{Q}_n}\norm{Q(G_i)-G_j}_F^2.	
 \end{align}
 Let $\mh{L}_{GM-k_sNN}'$ indicate the misclassification rate of the $k_s$NN classifier using the above graph-matched norm.  Given an exact graph matching function---a function that actually solves Eq. \eqref{eq:d}---we have the following result
 % we can use this as the distance in a $k_s$NN algorithm, referred to as the GM-$k_s$NN. 

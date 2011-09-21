@@ -33,16 +33,21 @@ Abin(Abin>t)=1;
 
 %% 3. select/generate data
 
-datatype='synthetic';
+datatype='ind_edge';
 
 if strcmp(datatype,'synthetic')
     const=get_constants(Abin,ClassIDs);
     P=get_ind_edge_params(Abin,const,'mle');
     
-    Ns=100;    
+    Ns=500;    
     
     P.E0=mean(double(Abin(:,:,ClassIDs==0)),3);
     P.E1=mean(double(Abin(:,:,ClassIDs==1)),3);
+    
+    Nvertices=10;
+    P.E0=P.E0(1:Nvertices,1:Nvertices);
+    P.E1=P.E1(1:Nvertices,1:Nvertices);
+    
     
     % % (testing using non-synthetic data to make sure code works)
     % Nvertices=10;
@@ -60,6 +65,21 @@ if strcmp(datatype,'synthetic')
     subplot(211), imagesc(P_syn.E0-P.E0), colorbar
     subplot(212), imagesc(P_syn.E1-P.E1), colorbar
     
+elseif strcmp(datatype,'syntheticweighted')
+    const=get_constants(Abin,ClassIDs);
+    P=get_ind_edge_params(Abin,const,'mle');
+    
+    Ns=100;    
+    
+    P.E0=mean(double(log(Awei(:,:,ClassIDs==0)+1)),3);
+    P.E1=mean(double(log(Awei(:,:,ClassIDs==1)+1)),3);
+
+    P.E0(idu)=0; 
+    P.E1(idu)=0;
+    
+    [Gs_La Ys P_syn] = generate_synthetic_data(P,ClassIDs,Ns,'Poisson');
+    
+    
 elseif strcmp(datatype,'weighted')
     Gs_La=Awei;
     Ys=ClassIDs';
@@ -68,6 +88,24 @@ elseif strcmp(datatype,'binary')
     Gs_La=Abin;
     Ys=ClassIDs';
     Ns=length(Ys);
+elseif strcmp(datatype,'ind_edge')
+    
+    Ns=500;
+    P.E0=rand(Nvertices);
+    P.E1=rand(Nvertices);
+
+    P.E0(idu)=0; 
+    P.E1(idu)=0;
+    
+    Nvertices=10;
+    P.E0=P.E0(1:Nvertices,1:Nvertices);
+    P.E1=P.E1(1:Nvertices,1:Nvertices);
+    
+    ClassIDs=[zeros(1,Ns/2) ones(1,Ns/2)];
+    
+    [Gs_La Ys P_syn] = generate_synthetic_data(P,ClassIDs,Ns,'Bernoulli');
+
+    
 else
     disp('no data selected')
 end
@@ -139,13 +177,14 @@ GI_IDM = InterpointDistanceMatrix(x);
 %% 9. plot some stuff
 
 % plot(Lhatf_shuffled),
-figure(1), clf, plot(Lhats.knn), hold all
+figure(1), clf, 
+plot(Lhats.knn), hold all
 plot(Lhats.shuffled)
 plot(Lhats.GI)
 xlabel('k')
 ylabel('misclassification rate')
 
-legend('labeled','unshuffled')
+legend('labeled','unshuffled','invariants')
 print('-dpng','../figs/knn_Lhats')
 
 
@@ -194,3 +233,24 @@ print('-dpng','../figs/knn_Lhats')
 %% 9. save stuff
 
 save(['../data/', datatype, '_classification'])
+
+%%
+binLa=labeledIDM;
+binLa(binLa<=median(binLa(:)))=0;
+binLa(binLa>median(binLa(:)))=1;
+
+binSh=IDMd;
+binSh(binSh<=median(binSh(:)))=0;
+binSh(binSh>median(binSh(:)))=1;
+
+subplot(231), imagesc(labeledIDM)
+subplot(232), imagesc(IDMd)
+% subplot(233), imagesc(labe~=binSh)
+
+
+subplot(234), imagesc(binLa)
+subplot(235), imagesc(binSh)
+subplot(236), imagesc(binLa~=binSh)
+
+
+

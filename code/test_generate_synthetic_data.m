@@ -33,7 +33,7 @@ Abin(Abin>t)=1;
 
 %% 3. select/generate data
 
-datatype='ind_edge';
+datatype='binary';
 
 if strcmp(datatype,'synthetic')
     const=get_constants(Abin,ClassIDs);
@@ -115,9 +115,9 @@ end
 
 kvec = 1:(Ns-1);
 
-labeledIDM = InterpointDistanceMatrix(Gs_La);
+IDM_La = InterpointDistanceMatrix(Gs_La);
 
-[Lhats.knn yhat] = knnclassifyIDM(labeledIDM,Ys,kvec);
+[Lhats.knn yhat] = knnclassifyIDM(IDM_La,Ys,kvec);
 
 
 %% 5. shuffle graphs
@@ -153,9 +153,9 @@ end
 
 %% 7. knn clasify unshuffled graphs
 
-IDMd=d'+d;
-IDMd(1:Ns+1:end)=inf;
-[Lhats.shuffled] = knnclassifyIDM(IDMd,Ys,kvec);
+IDM_Sh=d'+d;
+IDM_Sh(1:Ns+1:end)=inf;
+[Lhats.shuffled] = knnclassifyIDM(IDM_Sh,Ys,kvec);
 
 
 %% 8. knn classify using graph invariants
@@ -167,12 +167,12 @@ for i=1:Ns
     Gs_LaaL(:,:,i)=A;
 end
 
-x = get_graph_invariants(Gs_LaaL,1:7);
+x = get_graph_invariants(Gs_LaaL,[1:3 5]);
 x=x-repmat(mean(x')',1,Ns);
 x=x./repmat(std(x,[],2),1,Ns);
 
-GI_IDM = InterpointDistanceMatrix(x);
-[Lhats.GI yhat] = knnclassifyIDM(GI_IDM,Ys,kvec(kvec<Ns));
+IDM_GI = InterpointDistanceMatrix(x);
+[Lhats.GI yhat] = knnclassifyIDM(IDM_GI,Ys,kvec(kvec<Ns));
 
 %% 9. plot some stuff
 
@@ -234,23 +234,60 @@ print('-dpng','../figs/knn_Lhats')
 
 save(['../data/', datatype, '_classification'])
 
+%% plot dissimilarity matrices
+% binLa=IDM_La;
+% binLa(binLa<=median(binLa(:)))=0;
+% binLa(binLa>median(binLa(:)))=1;
+% 
+% binSh=IDM_Sh;
+% binSh(binSh<=median(binSh(:)))=0;
+% binSh(binSh>median(binSh(:)))=1;
+% 
+% subplot(231), imagesc(IDM_La)
+% subplot(232), imagesc(IDM_Sh)
+% % subplot(233), imagesc(labe~=binSh)
+% 
+% 
+% subplot(234), imagesc(binLa)
+% subplot(235), imagesc(binSh)
+% subplot(236), imagesc(binLa~=binSh)
+
 %%
-binLa=labeledIDM;
-binLa(binLa<=median(binLa(:)))=0;
-binLa(binLa>median(binLa(:)))=1;
-
-binSh=IDMd;
-binSh(binSh<=median(binSh(:)))=0;
-binSh(binSh>median(binSh(:)))=1;
-
-subplot(231), imagesc(labeledIDM)
-subplot(232), imagesc(IDMd)
-% subplot(233), imagesc(labe~=binSh)
 
 
-subplot(234), imagesc(binLa)
-subplot(235), imagesc(binSh)
-subplot(236), imagesc(binLa~=binSh)
+j=0;
+if Ns>100
+    is=[10:10:100 200:100:400];
+else
+    is=[10:10:Ns];
+end
 
+kk=1;
+kmax=10;
+for i=is
+    j=j+1;
+    
+    parfor k=1:kmax
+        ix=randperm(Ns);
+        ix=ix(1:i);
+        
+        subIDM_La=IDM_La(ix,ix);
+        subIDM_Sh=IDM_Sh(ix,ix);
+        subIDM_GI=IDM_GI(ix,ix);
+        
+        sub_La(j,k) = knnclassifyIDM(subIDM_La,Ys(ix),kk);
+        sub_Sh(j,k) = knnclassifyIDM(subIDM_Sh,Ys(ix),kk);
+        sub_GI(j,k) = knnclassifyIDM(subIDM_GI,Ys(ix),kk);
+    end
+    
+end
 
+figure(2), clf, hold all
+errorbar(is,mean(sub_La,2),std(sub_La,[],2)./kmax)
+errorbar(is,mean(sub_Sh,2),std(sub_Sh,[],2)./kmax)
+errorbar(is,mean(sub_GI,2),std(sub_GI,[],2)./kmax)
+legend('labeled','shuffled','GI')
+grid on
+
+print('-dpng',['../figs/Lhat_vs_s_' datatype])
 

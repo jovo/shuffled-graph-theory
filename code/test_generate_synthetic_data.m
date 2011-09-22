@@ -254,16 +254,18 @@ save(['../data/', datatype, '_classification'])
 
 %%
 
-
+clear sub_La sub_Sh sub_GI
 j=0;
 if Ns>100
     is=[10:10:100 200:100:400];
-else
+elseif Ns>=50 && Ns<=100
     is=[10:10:Ns];
+elseif Ns<50
+    is=[5 10:10:40 45];
 end
 
 kk=1;
-kmax=10;
+kmax=200;
 for i=is
     j=j+1;
     
@@ -282,12 +284,20 @@ for i=is
     
 end
 
+%%
+fs=12;
 figure(2), clf, hold all
-errorbar(is,mean(sub_La,2),std(sub_La,[],2)./kmax)
-errorbar(is,mean(sub_Sh,2),std(sub_Sh,[],2)./kmax)
 errorbar(is,mean(sub_GI,2),std(sub_GI,[],2)./kmax)
-legend('labeled','shuffled','GI')
+errorbar(is,mean(sub_Sh,2),std(sub_Sh,[],2)./kmax)
+errorbar(is,mean(sub_La,2),std(sub_La,[],2)./kmax)
+legend('GI','Sh','La')
 grid on
+axis([0 50 0.35 .6])
+xlabel('number of training samples','fontsize',fs)
+ylabel('misclassification rate','fontsize',fs)
+title('k_sNN Classifier Comparison','fontsize',fs)
 
-print('-dpng',['../figs/Lhat_vs_s_' datatype])
+etc.wh=[2 2];
+etc.figname=['../figs/Lhat_vs_s_' datatype];
+printfig(etc)
 

@@ -39,14 +39,14 @@ if strcmp(datatype,'synthetic')
     const=get_constants(Abin,ClassIDs);
     P=get_ind_edge_params(Abin,const,'mle');
     
-    Ns=500;    
+    Ns=49;    
     
     P.E0=mean(double(Abin(:,:,ClassIDs==0)),3);
     P.E1=mean(double(Abin(:,:,ClassIDs==1)),3);
     
-    Nvertices=10;
-    P.E0=P.E0(1:Nvertices,1:Nvertices);
-    P.E1=P.E1(1:Nvertices,1:Nvertices);
+%     Nvertices=10;
+%     P.E0=P.E0(1:Nvertices,1:Nvertices);
+%     P.E1=P.E1(1:Nvertices,1:Nvertices);
     
     
     % % (testing using non-synthetic data to make sure code works)
@@ -113,7 +113,7 @@ end
 
 %% 4. knn classify labeled graphs and plot results
 
-kvec = 1:(Ns-1);
+kvec = 1:2:(Ns-1);
 
 IDM_La = InterpointDistanceMatrix(Gs_La);
 
@@ -129,8 +129,10 @@ for i=1:Ns
     A=A+A';
     Gs_Sh(:,:,i)=A(q,q);
 end
+IDM_alg1 = InterpointDistanceMatrix(Gs_Sh);
 
 % if any(Gs_Sh>1), err('something is horrible'), end
+
 
 %% 6. compute unlabeled interpoint distance matrix
 
@@ -167,7 +169,7 @@ for i=1:Ns
     Gs_LaaL(:,:,i)=A;
 end
 
-x = get_graph_invariants(Gs_LaaL,[1:3 5]);
+x = get_graph_invariants(Gs_LaaL,[1:7]);
 x=x-repmat(mean(x')',1,Ns);
 x=x./repmat(std(x,[],2),1,Ns);
 
@@ -230,9 +232,6 @@ print('-dpng','../figs/knn_Lhats')
 %
 % end
 
-%% 9. save stuff
-
-save(['../data/', datatype, '_classification'])
 
 %% plot dissimilarity matrices
 % binLa=IDM_La;
@@ -254,18 +253,18 @@ save(['../data/', datatype, '_classification'])
 
 %%
 
-clear sub_La sub_Sh sub_GI
+clear sub_La sub_Sh sub_GI sub_alg1 sub_chance
 j=0;
 if Ns>100
     is=[10:10:100 200:100:400];
 elseif Ns>=50 && Ns<=100
     is=[10:10:Ns];
 elseif Ns<50
-    is=[5 10:10:40 45];
+    is=[5 10:10:40 45 48];
 end
 
 kk=1;
-kmax=200;
+kmax=2000;
 for i=is
     j=j+1;
     
@@ -276,28 +275,56 @@ for i=is
         subIDM_La=IDM_La(ix,ix);
         subIDM_Sh=IDM_Sh(ix,ix);
         subIDM_GI=IDM_GI(ix,ix);
+        subIDM_alg1=IDM_alg1(ix,ix);
         
         sub_La(j,k) = knnclassifyIDM(subIDM_La,Ys(ix),kk);
         sub_Sh(j,k) = knnclassifyIDM(subIDM_Sh,Ys(ix),kk);
         sub_GI(j,k) = knnclassifyIDM(subIDM_GI,Ys(ix),kk);
+        sub_alg1(j,k) = knnclassifyIDM(subIDM_alg1,Ys(ix),kk);
+        
+        pihat=sum(Ys(ix))/length(Ys(ix));
+        if pihat>0.5; Yhat=1; else Yhat=0; end
+        sub_chance(j,k) = Yhat;
     end
     
 end
 
+
+%% 9. save stuff
+
+save(['../data/', datatype, '_classification'])
+
 %%
 fs=12;
 figure(2), clf, hold all
-errorbar(is,mean(sub_GI,2),std(sub_GI,[],2)./kmax)
-errorbar(is,mean(sub_Sh,2),std(sub_Sh,[],2)./kmax)
-errorbar(is,mean(sub_La,2),std(sub_La,[],2)./kmax)
-legend('GI','Sh','La')
+% colors(1,:)=[1 1 1];
+% colors(2,:)=0.75*[1 1 1];
+% colors(3,:)=0.5*[1 1 1];
+% colors(4,:)=0.25*[1 1 1];
+
+errorbar(is,mean(sub_GI,2),std(sub_GI,[],2)./kmax,'linewidth',2,'color',0.5*[1 1 1],'linestyle','-')
+errorbar(is,mean(sub_Sh,2),std(sub_Sh,[],2)./kmax,'linewidth',2,'color','k','linestyle','--')
+errorbar(is,mean(sub_La,2),std(sub_La,[],2)./kmax,'linewidth',2,'color',0.5*[1 1 1],'linestyle','--')
+errorbar(is,mean(sub_alg1,2),std(sub_alg1,[],2)./kmax,'linewidth',2,'color','k','linestyle','-')
+line([0 50],[1-sum(Ys)/length(Ys) 1-sum(Ys)/length(Ys)],'color',0.75*[1 1 1],'linestyle','-','linewidth',1)
+
+
+text(10,.42,'$\delta$','Interpreter','latex','fontsize',10,'color',0.5*[1 1 1])
+text(15,.46,'$\tilde{\delta}$','Interpreter','latex','fontsize',10,'color','k')
+text(23,.467,'$\psi$','Interpreter','latex','fontsize',10,'color',0.5*[1 1 1])
+text(35,.48,'$\hat{\pi}$','Interpreter','latex','fontsize',10,'color',0.75*[1 1 1])
+text(31,.525,'$\delta^\prime$','Interpreter','latex','fontsize',10,'color','k')
+
+
+
+% legend('GI','alg2','La','alg1','location','NorthWest')
 grid on
-axis([0 50 0.35 .6])
+axis([0 50 0.35 .55])
 xlabel('number of training samples','fontsize',fs)
 ylabel('misclassification rate','fontsize',fs)
-title('k_sNN Classifier Comparison','fontsize',fs)
+title('1NN Classifier Comparison','fontsize',fs)
 
-etc.wh=[2 2];
+etc.wh=[4 2.5];
 etc.figname=['../figs/Lhat_vs_s_' datatype];
 printfig(etc)
 

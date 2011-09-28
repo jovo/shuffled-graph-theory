@@ -322,7 +322,7 @@ grid on
 axis([0 50 0.35 .55])
 xlabel('number of training samples','fontsize',fs)
 ylabel('misclassification rate','fontsize',fs)
-title('1NN Classifier Comparison','fontsize',fs)
+title('Connectome Classifier Comparison','fontsize',fs)
 
 etc.wh=[4 2.5];
 etc.figname=['../figs/Lhat_vs_s_' datatype];

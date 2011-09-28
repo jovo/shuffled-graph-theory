@@ -390,15 +390,17 @@ Thus while one could merely plug the shuffled graphs into $\bth_y'$, such a proc
 	$\mh{\mt{L}}_s \conv \mt{L}_*$ as $s \conv \infty$.
 \end{coro}
 
-Because $|\mt{\mc{G}}_n| \ll \mc{G}_n$ (by a factor of approximately $n!$), it follows that although both $\mh{h}_s'$ and $\mh{\mt{h}}_s$ are universally consistent, $\mh{h}_s'$ will generally perform worse.  In fact, we have the following result:
+Because $|\mt{\mc{G}}_n| \ll |\mc{G}_n|$ (by a factor of approximately $n!$), it follows that although both $\mh{h}_s'$ and $\mh{\mt{h}}_s$ are universally consistent, $\mh{h}_s'$ will generally perform worse.  In fact, we have the following result:
 \begin{thm} \label{thm:inadmiss}
-	$\EE[\mh{L}_s'] \geq \EE[\mh{\mt{L}}_s] \geq \EE[\mh{L}_s]$ for all $s$. 
+	$\mh{h}_s'$ is inadmissible under $0-1$ loss. 
 \end{thm}
 \begin{proof}
-	The first inequality follows from $\mh{\theta}_{G'|y}$ converging to $\theta'_{G|y}$ slower than $\mh{\mt{\theta}}_{\mt{G}|y}$ converges to $\mt{\theta}_{\mt{G}|y}$.  Although $\theta'_{G|y}$ and  $\mt{\theta}_{\mt{G}|y}$ encode identical information, the dimensionality of the two differs drastically.  Specifically, $\mt{\theta}_{\mt{G}|y} \in \triangle_{\mt{d}_n}$ and $\theta'_{\mt{G}|y} \in \triangle_{d_n}$, and $\mt{d}_n \approx d_n/n!$.
+	Assume that there exists at least one unlabeled set $\mt{G}$ with two elements, $G_1, G_2$, such that $\mt{\theta}_{\mt{G}|y_i}\neq \mt{\theta}_{\mt{G}|y_j}$ for  $y_i \neq y_j$.  $\mh{h}'_s$ depends on estimating $\theta'_{G_1|y}$ and $\theta'_{G_2|y}$ for $y\in\mc{Y}$, whereas $\mh{\mt{h}}_s$ depends on only estimating $\mh{\mt{\theta}}_{\mt{G}|y}$ for $y \in \mc{Y}$. Now consider two scenarios.  In the first scenario, assume that all training data are $G_1$.  If the test shuffled graph is also $G_1$, the estimates, $\mh{\theta}'_{G_1|y}$ and $\mh{\mt{\theta}}_{\mt{G}|y}$ for $y \in \mc{Y}$, yield the same answer.  However, if the test shuffled graph is $G_2$, the shuffled plugin classifier $\mh{h}'_s$ will randomly assign a class, whereas the unshuffled plugin classifier $\mh{\mt{h}}_s$ will classify according to the maximum a posteriori class appropriately (and will have lower variance).  In the second scenario, training data include both $G_1$ and $G_2$.  
+
 	
-	The second inequality follows from....
-	Therefore, $\mh{L}_s'$ is inadmissible under $0-1$ loss. Moreover, if vertex labels are available, $\mh{\mt{L}}_s$ is also inadmissible under $0-1$ loss.  
+% $\EE[\mh{L}_s'] \geq \EE[\mh{\mt{L}}_s]$ for all $s$.
+% 	The first inequality follows from $\mh{\theta}'_{G|y}$ converging to $\theta'_{G|y}$ slower than $\mh{\mt{\theta}}_{\mt{G}|y}$ converges to $\mt{\theta}_{\mt{G}|y}$.  Although $\theta'_{G|y}$ and  $\mt{\theta}_{\mt{G}|y}$ encode identical information, the dimensionality of the two differs drastically.  Specifically, $\mt{\theta}_{\mt{G}|y} \in \triangle_{\mt{d}_n}$ and $\theta'_{\mt{G}|y} \in \triangle_{d_n}$, and $\mt{d}_n \approx d_n/n!$.
+Moreover, if vertex labels are available, $\mh{\mt{h}}_s$ is also inadmissible under $0-1$ loss.  
 \end{proof}
 
 % \begin{proof}

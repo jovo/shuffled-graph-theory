@@ -45,7 +45,7 @@ E-mail: \{joshuav,cep\}@jhu.edu
 
 \IEEEcompsoctitleabstractindextext{%
 \begin{abstract}
-In this work, we investigate the extent to which shuffling vertex labels can hinder classification performance, and for which random graph models one might expect this shuffling to be impactful.  Via theory we demonstrate a collection of results.  Specifically, if one ``shuffles'' the graphs prior to classification, the vertex label information is irretrievably lost, which can degrade classification performance (and often does).  A specific graph-invariant classifier is shown to be Bayes optimal.  Moreover, this classifier may be induced by training data in a consistent and efficient fashion.  Unfortunately, both computational and sample size burdens make this ``plugin'' classifier impractical.  A graph-matched Frobenius norm $k_s$ nearest neighbor classifier, however, is also universally consistent, and expected to converge faster whenever ``nearness'' implies same class.  Finally, we apply this approach to a connectome classification problem (a connectome is brain-graph where vertices correspond to (groups of) neurons and edges correspond to connections between them).  The graph-matched $k_s$NN classifier on the shuffled graphs performs better than a typical graph-invariant based $k_s$NN strategy, but not quite as well as the $k_s$NN on the labeled graphs.  Thus, we demonstrate the practical utility of the theoretical derivations herein.  Extending these results to weighted and (certain) attributed random graph models is straightforward.  
+In this work, we investigate the extent to which shuffling vertex labels can hinder classification performance, and for which random graph models one might expect this shuffling to be impactful.  Via theory we demonstrate a collection of results.  Specifically, if one ``shuffles'' the graphs prior to classification, the vertex label information is irretrievably lost, which can degrade classification performance (and often does).  A specific graph-invariant classifier is shown to be Bayes optimal.  Moreover, this classifier may be induced by training data in a consistent and efficient fashion.  Unfortunately, both computational and sample size burdens make this ``plugin'' classifier impractical.  A graph-matched Frobenius norm $k_s$ nearest neighbor classifier, however, is also universally consistent as $s$ (the number of training samples) goes to infinity, and expected to converge faster whenever ``nearness'' implies same class.  Finally, we apply this approach to a connectome classification problem (a connectome is brain-graph where vertices correspond to (collections of) neurons and edges correspond to connections between them).  The graph-matched $k_s$NN classifier on the shuffled graphs performs better than a typical graph-invariant based $k_s$NN strategy, but not quite as well as the $k_s$NN on the labeled graphs, on a real connectome classification problem.  Thus, we demonstrate the practical utility of the theoretical derivations herein.  Extending these results to weighted and (certain) attributed random graph models is straightforward.  
 \end{abstract}
 
 % Note that keywords are not normally used for peer review papers.
@@ -67,7 +67,7 @@ statistical inference, graph theory, network theory, structural pattern recognit
 
 These implications are especially important in the emerging field of ``connectomics'', the study of connections of the brain \cite{Hagmann05, Sporns2010}.  In connectomics, one represents the brain as a graph (a brain-graph), where vertices correspond to (groups of) neurons and edges correspond to connections between them.  In the lower part of the evolutionary hierarchy (e.g., worms and flies), many neurons have been assigned labels \cite{WhiteBrenner86}.  However, for even the simplest vertebrates, vertex labels are mostly unavailable when vertices correspond to neurons.  
 
-Thus, it seems classification of brain-graphs is likely to become increasingly popular.  Although previous work has demonstrated some possible strategies of graph classification in both the labeled \cite{VP11_sigsub} and unlabeled \cite{Duin2011} scenarios, relatively little work has compared the theoretical limitations of the two.  We therefore develop a random graph model amenable to such theoretical investigations.  The theoretical results lead to practical universally consistent graph classification algorithms.  We demonstrate that these algorithms have desirable finite sample properties via simulation and synthetic data analysis.
+Classification of brain-graphs is poised to become increasingly popular.  Although previous work has demonstrated some possible strategies of graph classification in both the labeled \cite{VP11_sigsub} and unlabeled \cite{Duin2011} scenarios, relatively little work has compared the theoretical limitations of the two.  We therefore develop a random graph model amenable to such theoretical investigations.  The theoretical results lead to practical universally consistent graph classification algorithms.  We demonstrate that these algorithms have desirable finite sample properties via a real brain-graph classification problem of significant scientific interest: sex classification.
 
 
 
@@ -90,23 +90,37 @@ Thus, it seems classification of brain-graphs is likely to become increasingly p
 % subsection a_labeled_graph_classification_model (end)
 
 
-A (labeled) graph $G=(\mc{V},\mc{E})$ consists of a vertex set $\mc{V}$, where $|\mc{V}|=n < \infty$ is the number of vertices, and an edge set $\mc{E}$, where $|\mc{E}| \leq n^2$.
-Let $\GG\colon \Omega \to \mc{G}_n$ be a graph-valued random variable taking values $G\in \mc{G}_n$, where $\mc{G}_n$ is the set of graphs on $n$ vertices. The cardinality of $\mc{G}_n$ is super-exponential in $n$.  For example, when all graphs are assumed to be simple (that is, undirected binary edges without loops), then $|\mc{G}_n|=2^{\binom{n}{2}}=d_n$. 
-Let $Y$ be a categorical random variable, $Y\colon \Omega \to \mc{Y}=\{y_0,\ldots, y_{c}\}$, where $c< \infty$.  Assume the existence of a joint distribution, $\PP_{\GG,Y}$ which can be decomposed into the product of a class-conditional distribution (likelihood) $\PP_{\GG|Y}$ and a class prior $\pi_Y$. Because $n$ is finite, the class-conditional  distributions $\PP_{\GG | Y=y}=\PP_{\GG|y}$ can be considered discrete distributions $\text{Discrete}(G; \bth_y)$, where $\bth_y$ is an element of the $d_n$-dimensional unit simplex $\triangle_{d_n}$ (satisfying $\theta_{G|y}\geq 0$ $\forall G \in \mc{G}_n$ and $\sum_{G \in \mc{G}_n} \theta_{G|y}=1$).
+A labeled graph $G=(\mc{V},\mc{E})$ consists of a vertex set $\mc{V}$, where $|\mc{V}|=n < \infty$ is the number of vertices, and an edge set $\mc{E}$, where $|\mc{E}| \leq n^2$.
+\begin{defi}
+Let $\GG\colon \Omega \to \mc{G}_n$ be a \emph{labeled} graph-valued random variable taking values $G\in \mc{G}_n$, where $\mc{G}_n$ is the set of labeled graphs on $n$ vertices.	
+\end{defi}
+The cardinality of $\mc{G}_n$ is super-exponential in $n$.  For example, when all labeled graphs are assumed to be simple (that is, undirected binary edges without loops), then $|\mc{G}_n|=2^{\binom{n}{2}}=d_n$. 
+Let $Y$ be a categorical random variable, $Y\colon \Omega \to \mc{Y}=\{y_0,\ldots, y_{c}\}$, where $c< \infty$.  Assume the existence of a joint distribution, $\PP_{\GG,Y}$ which can be decomposed into the product of a class-conditional distribution (likelihood) $\PP_{\GG|Y}$ and a class prior $\pi_Y$. Because $n$ is finite, the class-conditional  distributions $\PP_{\GG | Y=y}=\PP_{\GG|y}$ can be considered discrete distributions $\text{Discrete}(G; \theta_y)$, where $\theta_y$ is an element of the $d_n$-dimensional unit simplex $\triangle_{d_n}$ (satisfying $\theta_{G|y}\geq 0$ $\forall G \in \mc{G}_n$ and $\sum_{G \in \mc{G}_n} \theta_{G|y}=1$).
 
 
-% $\bth_y=[\theta_{1|y},\ldots \theta_{d|y}]\T \in \triangle_d$, where  $d=d_n=2^{\binom{n}{2}}$ and $\triangle_d$ is the $d$-dimensional simplex (that is, $\theta_{i|y}\geq 0$ for all $i \in [d]$ and $\sum_{i \in [d]} \theta_{i|y}=1$). 
+% $\theta_y=[\theta_{1|y},\ldots \theta_{d|y}]\T \in \triangle_d$, where  $d=d_n=2^{\binom{n}{2}}$ and $\triangle_d$ is the $d$-dimensional simplex (that is, $\theta_{i|y}\geq 0$ for all $i \in [d]$ and $\sum_{i \in [d]} \theta_{i|y}=1$). 
 
 \subsection{A shuffled graph classification model} % (fold)
 \label{sub:a_shuffled_graph_classification_model}
 
 % subsection a_shuffled_graph_classification_model (end)
 
-In the above, it was implicitly assumed that the vertex labels were observed.  However, in certain situations (such as the motivating connectomics example presented in Section \ref{sec:1}), this assumption is unwarranted.  To proceed, we define two graphs $G,G' \in \mc{G}_n$ to be isomorphic if and only if there exists a vertex permutation (shuffle) function $\Qs\colon\mc{G}_n \to \mc{G}_n$ such that $\Qs(G)=G'$.  Let $\QQ$ be a permutation-valued random variable, $\QQ\colon\Omega \to \mc{Q}_n$, where $\mc{Q}_n$ is the space of vertex permutation functions on $n$ vertices so that $|\mc{Q}_n|=n!$.  Extending the model to include this vertex shuffling distribution yields $\PP_{\QQ,\GG,Y}$.  We assume throughout this work (with loss of generality) that the shuffling distribution is both \emph{class independent} and \emph{graph independent}; therefore, this joint model can be decomposed as
+% A shuffled graph $G'=(G,Q)$ consists of a labeled graph and a shuffling (vertex permutation) function $Q: \mc{G}_n \to \mc{G}_n$.  Let $\GG' \colon \Omega \to \mc{G}_n'$ be a shuffled graph-valued random variable taking values $G' \in \mc{G}_n'$, where $\mc{G}_n'$ is the set of shuffled graphs on $n$ vertices.  Moreover, let $\QQ$ be a permutation-valued random variable, $\QQ\colon\Omega \to \mc{Q}_n$, where $\mc{Q}_n$ is the space of vertex permutation functions on $n$ vertices so that $|\mc{Q}_n|=n!$. The cardinality of $\mc{G}_n'$ is therefore $|\mc{G}_n| n!$.  Note however, that $\QQ$ is a permutation of the vertices, thus realizations of $\QQ(\GG)$ must live within a set of cardinality $|\mc{G}_n|$.
+
+% OLD PARAGRAPH BEGINS:
+In the above, it was implicitly assumed that the vertex labels were observed.  However, in certain situations (such as the motivating connectomics example presented in Section \ref{sec:1}), this assumption is unwarranted.  To proceed, we define two graphs $G,G' \in \mc{G}_n$ to be isomorphic if and only if there exists a vertex permutation (shuffle) function $\Qs\colon\mc{G}_n \to \mc{G}_n$ such that $\Qs(G)=G'$.  Let $\QQ$ be a permutation-valued random variable, $\QQ\colon\Omega \to \mc{Q}_n$, where $\mc{Q}_n$ is the space of vertex permutation functions on $n$ vertices so that $|\mc{Q}_n|=n!$.  
+% OLD PARAGRAPH ENDS
+\begin{defi} \label{def:shuffled}
+Let $\GG'=\QQ(\GG): \Omega \to \mc{G}_n'$ be a \emph{shuffled} graph-valued random variable, that is, a labeled graph valued random variable that has been passed through a shuffle channel $\QQ$. Note that $|\mc{G}_n'|=|\mc{G}_n|$. % taking values $G\in \mc{G}_n$, where $\mc{G}_n$ is the set of labeled graphs on $n$ vertices.	
+\end{defi}
+
+Extending the above graph-classification model to include this vertex shuffling distribution yields $\PP_{\QQ,\GG,Y}$.  We assume throughout this work (with loss of generality) that the shuffling distribution is both \emph{class independent} and \emph{graph independent}; therefore, this joint model can be decomposed as
 \begin{align}
-	\PP_{\QQ,\GG,Y} = \PP_{\QQ} \PP_{\GG,Y} = \PP_{\QQ} \PP_{\GG |Y} \pi_Y.
+	\PP_{\QQ,\GG,Y} = \PP_{\QQ} \PP_{\GG,Y} = \PP_{\QQ} \PP_{\GG |Y} \pi_Y = \PP_{\QQ(\GG) |Y} \pi_Y.
 \end{align}
-As in the labeled case, the shuffled graph class-conditional distributions $\PP_{\QQ(\GG)|y}$ can be represented by discrete distributions $\text{Discrete}(G; \bth_y')$, where again $\bth_y' \in \triangle_{d_n}$.  When $\PP_{\QQ}$ is uniform on $\mc{Q}_n$, all shuffled graphs within the same isomorphism set are equally likely; that is  $\{\theta_{G_i|y}' = \theta_{G_j|y}' \, \forall G_i,G_j \colon \Qs(G_i)=G_j$ for some $\Qs \in \mc{Q}_n\}$.
+As in the labeled case, the shuffled graph class-conditional distributions $\PP_{\QQ(\GG)|y}$ can be represented by discrete distributions $\text{Discrete}(G; \theta_y')$.  Because $\QQ(\GG)$ can be any of $|\mc{G}_n|$ different graphs, it must be that $\theta_y' \in \triangle_{d_n}$.  When $\PP_{\QQ}$ is uniform on $\mc{Q}_n$, all shuffled graphs within the same isomorphism set are equally likely; that is  $\{\theta_{G_i|y}' = \theta_{G_j|y}' \, \forall G_i,G_j \colon \Qs(G_i)=G_j$ for some $\Qs \in \mc{Q}_n\}$.
+
+Note that one can think of a labeled graph as a shuffled graph for which $\QQ$ is a point mass at some $Q$.
 
 
 \subsection{An unlabeled graph classification model} % (fold)
@@ -117,7 +131,11 @@ As in the labeled case, the shuffled graph class-conditional distributions $\PP_
 Let $\mt{\mc{G}}_n$ be the collection of isomorphism sets.
 An \emph{unlabeled graph} $\mt{G}$ is an element of $\mt{\mc{G}}_n$. The number of unlabeled graphs on $n$ vertices is $|\mt{\mc{G}}_n|=\mt{d}_n \approx d_n/n!$ (see \cite{A000088} and references therein).
 % , and $|\mt{\mc{G}}_n|=\mt{d}_n$.  
-An \emph{isomorphism function} $U\colon \mc{G}_n \to \mt{\mc{G}}_n$ is a function that takes as input a graph and outputs the corresponding unlabeled graph. Let $\mt{\GG}\colon \Omega \to \mt{\mc{G}}_n$ be an unlabeled graph-valued random variable taking values $\mt{G} \in \mt{\mc{G}}_n$.   The joint distribution over unlabeled graphs and classes is therefore
+An \emph{unlabeling function} $U\colon \mc{G}_n \to \mt{\mc{G}}_n$ is a function that takes as input a graph and outputs the corresponding unlabeled graph. 
+\begin{defi}
+Let $\mt{\GG}=U(\GG)\colon \Omega \to \mt{\mc{G}}_n$ be an \emph{unlabeled} graph-valued random variable, that is, a labeled graph-valued random variable that has been passed through an unlabeled channel. In other words, $\mt{\GG}=\{Q(\GG)\}_{Q \in \mc{Q}_n}$, and takes values $\mt{G} \in \mt{\mc{G}}_n$. %$\colon \Omega \to \mt{\mc{G}}_n$ be an
+\end{defi}  
+The joint distribution over unlabeled graphs and classes is therefore
 $\PP_{\mt{\GG},Y}=\PP_{U(\GG),Y}=\PP_{U(\QQ(\GG)),Y}$, which decomposes as $\PP_{\mt{\GG}|Y} \pi_Y$. The class-conditional distributions $\PP_{\mt{\GG} | y}$ over isomorphism sets (unlabeled graphs) can also be thought of as discrete distributions $\text{Discrete}(\mt{G}; \mb{\mt{\theta}}_y)$ where $\mb{\mt{\theta}}_y\in \triangle_{\mt{d}_n}$ are vectors in the $\mt{d}_n$-dimensional unit simplex.   Comparing shuffling and unlabeling for the independent and uniform shuffle distribution $\PP_{\QQ}$, we have $\{\theta_{G|y}'=\mt{\theta}_{\mt{G}|y}/|\mt{G}|$ for all $G \in \mt{G}\}$.  
 
 
@@ -278,8 +296,8 @@ An immediate consequence of the above proof is that the inequality in the statem
 	% $$\min_y \mt{\PP}_{y}(\mt{G}) > \sum_{G' \in \mt{G}}\min_y\PP_y(G').$$
 	$$\min_y \mt{\theta}_{\mt{G}|y} > \sum_{G \in \mt{G}}\min_y \theta_{G|y}.$$
 \end{thm}
-The above result demonstrates that even when the labels \emph{do} carry some class-conditional signal, it may be the case that shuffling or unlabeling does not degrade performance.  In other words, to state that labels contain information is equivalent to stating that some graphs within an isomorphism set are class-conditionally more likely than others: $\exists \, \theta_{G_i|y} \neq \theta_{G_j|y}$ where $\Qs(G_i)=G_j$ for some $G_i,G_j \in \mc{G}_n$, $\Qs \in \mc{Q}_n$, and $y \in \mc{Y}$%, and that $\theta_{G_i|y}\neq \theta_{G_i|y'}$ or $\theta_{G_j|y}\neq \theta_{G_j|y'}$
-.  Shuffling has the effect of ``flattening'' likelihoods within isomorphism sets, from $\bth_y$ to $\bth_y'$, so that $\bth_y'$ satisfies $\{\theta_{G|y}'=\mt{\theta}_{\mt{G}|y}/|\mt{G}| \, \forall \colon G \in \mt{G}\}$.  But just because the shuffling changes class-conditional likelihoods does \emph{not} mean that Bayes risk must also change. This result follows immediately upon realizing that posteriors can change without classification performance changing.  The above results are easily extended to consider non-equal class priors and $c$-class classification problems.  To see this, ignoring ties, simply replace each minimum likelihood with a sum over all non-maximum posteriors: 
+The above result demonstrates that even when the labels \emph{do} carry some class-conditional signal, it may be the case that shuffling or unlabeling does not degrade performance.  In other words, the following two statements are equivalent: (i) the labels contain information with regard to the classification task, and (ii) some graphs within an isomorphism set are class-conditionally more likely than others: $\exists \, \theta_{G_i|y} \neq \theta_{G_j|y}$ where $\Qs(G_i)=G_j$ for some $G_i,G_j \in \mc{G}_n$, $\Qs \in \mc{Q}_n$, and $y \in \mc{Y}$%, and that $\theta_{G_i|y}\neq \theta_{G_i|y'}$ or $\theta_{G_j|y}\neq \theta_{G_j|y'}$
+.  Shuffling has the effect of ``flattening'' likelihoods within isomorphism sets, from $\theta_y$ to $\theta_y'$, so that $\theta_y'$ satisfies $\{\theta_{G|y}'=\mt{\theta}_{\mt{G}|y}/|\mt{G}| \, \forall \colon G \in \mt{G}\}$.  But just because the shuffling changes class-conditional likelihoods does \emph{not} mean that Bayes risk must also change. This result follows immediately upon realizing that posteriors can change without classification performance changing.  The above results are easily extended to consider non-equal class priors and $c$-class classification problems.  To see this, ignoring ties, simply replace each minimum likelihood with a sum over all non-maximum posteriors: 
 % $$\min_y \PP_y(G) \to \sum_{y \in \mc{Y}'} \PP_y(G) \text{ where } \mc{Y}' =\{y : y \neq \argmax_y \PP_y\}.$$
 \begin{multline}
 \min_y \theta_{G|y} \pi_y \mapsto \sum_{y \in \mc{Y}'} \theta_{G|y} \pi_y \\ \text{ where } \mc{Y}' =\{y \colon y \neq \argmax_y \theta_{G|y}\}.
@@ -302,7 +320,8 @@ where $\Psi$ is the space of all possible invariants and $\mc{F}^{\psi}$ is the 
 Let $\psi$ indicate in which equivalence set $G$ resides; that is,  $\psi(G)=\mt{G}$ if and only if $G \in \mt{G}$.  Then
 % $f_{G'}(G)$ be a graph matching function; that is, $f\colon \mc{G}_n \times \mc{G}_n \to \{0,1\}$, taking value unity whenever $G$ and $G'$ are isomorphic to one another.  Let $\psi(G)=\mb{f}(G)$, where $\mb{f}=(f_{G_1}, \ldots, f_{G_{\mt{d}}})$.  In words, $\phi(G)$ outputs a vector of length $\mt{d}_n$ with a single non-zero entry in the isomorphism set of $G$.  Let $h^{\psi}$ be an indicator function for the maximum a posteriori class of the corresponding isomorphism set. For instance, if $G \in \mt{G}_j$, then
 \begin{align}
-	h^{\psi}_*(G)= \argmax_{y \in \mc{Y}} \mt{\theta}_{\psi(G)|y} \pi_y = \argmax_{y \in \mc{Y}} \mt{\theta}_{\mt{G}|y} \pi_y = \mt{h}_*(G).
+	h^{\psi}_*(G) &= \argmax_{y \in \mc{Y}} \mt{\theta}_{\psi(G)|y} \pi_y \nonumber \\
+	&= \argmax_{y \in \mc{Y}} \mt{\theta}_{\mt{G}|y} \pi_y = \mt{h}_*(G).
 \end{align}
 % Thus, this graph invariant based classifier is the unlabeled Bayes optimal classifier.
 \end{proof}
@@ -313,9 +332,9 @@ Let $\psi$ indicate in which equivalence set $G$ resides; that is,  $\psi(G)=\mt
 \label{sec:learning_optimal_classifiers_from_data}
 
 Section \ref{sec:shuffle} shows that one cannot fruitfully ``unshuffle'' graphs: once they have been shuffled by a uniform shuffler, any label information is lost.  Section \ref{sec:gi} shows that if graphs have been uniformly shuffled, there is a relatively straightforward algorithm for optimal classification. However, that classifier depends on knowing the parameters.
-%, $\mt{\bth}=\{\mt{\bth}_y\}_{y\in \mc{Y}}$ and $\mb{\pi}=\{\pi_y\}_{y \in \mc{Y}}$. 
+%, $\mt{\theta}=\{\mt{\theta}_y\}_{y\in \mc{Y}}$ and $\mb{\pi}=\{\pi_y\}_{y \in \mc{Y}}$. 
 When the parameters are unknown (effectively always), we assume that the data are sampled identically and independently from some unknown joint distribution: $(\QQ_i,\GG_i,Y_i)\overset{iid}{\sim}\PP_{\QQ,\GG,Y}$.  
-For \emph{labeled} graph classification the training data are $\mc{T}_s=\{\QQ_i,\GG_i,Y_i\}_{i \in [s]}$, where $[s]=\{1,\ldots,s\}$.  
+For \emph{labeled} graph classification the training data are $\mc{T}_s=\{\QQ_i,\GG_i,Y_i\}_{i \in [s]}$, where $[s]=\{1,\ldots,s\}$ (for labeled graphs, $\QQ$ is assumed to be observed and a point mass).  
 For \emph{shuffled} graph classification the training data are $\mc{T}_s'=\{\GG_i',Y_i\}_{i \in [s]}$, where $\GG_i'=\QQ_i(\GG_i)$---thus, we are unable to observe useful vertex labels.  For \emph{unlabeled} graph classification the training data are again $\mc{T}_s'$. We assume that $\PP_{\QQ}$ is uniform, so that all label information is both unavailable and irrecoverable.  Our task is to utilize training data to induce a classifier
 % $\mh{h}_s\colon \mc{G}_n \times (\mc{G}_n \times \mc{Y})^s \to \mc{Y}$ 
 that approximates 
@@ -333,16 +352,16 @@ as closely as possible.
 
 A \emph{labeled} graph Bayes plugin classifier,
 $\mh{h}_s: \mc{G}_n \times \mc{T}_s \to \mc{Y}$,
-estimates the parameters $\{\bth_y,\pi_y\}_{y \in \mc{Y}}$ using the training data $\mc{T}_s$, and then plugs those estimates into the labeled Bayes classifier, Eq. \eqref{eq:La_Bayes}, resulting in
+estimates the parameters $\{\theta_y,\pi_y\}_{y \in \mc{Y}}$ using the training data $\mc{T}_s$, and then plugs those estimates into the labeled Bayes classifier, Eq. \eqref{eq:La_Bayes}, resulting in
 \begin{align} \label{eq:La_Plug}
-	\mh{h}_s(G)=\argmax_{y\in\mc{Y}} \mh{\theta}_{G|y}\mh{\pi}_y.
+	\mh{h}_s(G)=\argmax_{y\in\mc{Y}} \hth_{G|y}\mh{\pi}_y.
 \end{align}
 
 A \emph{shuffled} graph Bayes plugin classifier,
 $\mh{h}_s': \mc{G}_n \times \mc{T}_s' \to \mc{Y}$,
-estimates the parameters $\{\bth_y',\pi_y\}_{y \in \mc{Y}}$ using the training data $\mc{T}_s'$, and then plugs those estimates into the shuffled Bayes classifier, Eq. \eqref{eq:Sh_Bayes}, resulting in
+estimates the parameters $\{\theta_y',\pi_y\}_{y \in \mc{Y}}$ using the training data $\mc{T}_s'$, and then plugs those estimates into the shuffled Bayes classifier, Eq. \eqref{eq:Sh_Bayes}, resulting in
 \begin{align} \label{eq:Sh_Plug}
-	\mh{h}_s'(G)=\argmax_{y\in\mc{Y}} \mh{\theta}_{G|y}'\mh{\pi}_y.
+	\mh{h}_s'(G)=\argmax_{y\in\mc{Y}} \hth_{G|y}'\mh{\pi}_y.
 \end{align}
 
 An \emph{unlabeled} graph Bayes plugin classifier,
@@ -357,50 +376,68 @@ first determines in which unlabeled set each shuffled graph resides, using $\psi
 % 	\mh{h}_s(\mt{G})=\argmax_{y\in\mc{Y}} \mh{\mt{\theta}}_{\mt{G}|y}\mh{\pi}_y. %, \text{ where } G\in \mt{G}_j.
 % \end{align}
 
+For brevity, we will sometimes refer to the above three induced classifiers as simply ``classifiers''.  Moreover, the sequence of classifiers (for example, $\{h_s\}_{s \to \infty}$) we will also refer to a ``classifier''. 
+
 \subsubsection{The Existence and Uniqueness of Universally Consistent Bayes Plug-in Graph Classifiers} % (fold)
 \label{sub:bayes_plug_in_classifiers_are_consistent}
 
 % subsection bayes_plug_in_classifiers_are_consistent (end)
 
+
 For the above three classifiers, there exist estimators such that the classifiers exist, are unique, and moreover, are universally consistent, although the relative convergence rates and values that they converge to differ.
 
-Let $\mh{L}_s=L(\mh{h}_s)$ be the risk of the induced \emph{labeled} graph Bayes plugin classifier using the training data $\mc{T}_s$ to obtain maximum likelihood estimators for $\{\bth_y,\pi_y\}_{y \in \mc{Y}}$.  This yields
+Let $\mh{L}_s=L(\mh{h}_s)$ be the risk of the induced \emph{labeled} graph Bayes plugin classifier using the training data $\mc{T}_s$ to obtain maximum likelihood estimators for $\{\theta_y,\pi_y\}_{y \in \mc{Y}}$. Note that $\mh{L}_s$ is a random variable, as it is a function of the random training data $\mc{T}_s$. This yields
 \begin{thm} \label{thm:4}
-	$\mh{L}_s \conv L_*$ as $s \conv \infty$.
+	$\mh{L}_s \pconv L_*$ as $s \conv \infty$.
 \end{thm}
 \begin{proof}
-Because ${\mc{G}}_n$ and $\mc{Y}$ are both finite, the maximum likelihood estimates for the categorical parameters $\{\bth_y,\pi_y\}_{y \in \mc{Y}}$ are guaranteed to exist and be unique \cite{Devroye1996}.  Hence, the labeled graph Bayes plugin classifier is universally consistent to ${L}_*$ (that is, it converges to ${L}_*$ regardless of the true joint distribution, $\PP_{\QQ, \GG ,Y}$) \cite{Devroye1996}. 
+Because ${\mc{G}}_n$ and $\mc{Y}$ are both finite, the maximum likelihood estimates for the categorical parameters $\{\theta_y,\pi_y\}_{y \in \mc{Y}}$ are guaranteed to exist and be unique \cite{Devroye1996}.  Hence, the labeled graph Bayes plugin classifier is universally consistent to ${L}_*$ (that is, it converges to ${L}_*$ regardless of the true joint distribution, $\PP_{\QQ, \GG ,Y}$) \cite{Devroye1996}. 
 % Note that this classifier is universally consistent, meaning that it converges to . %Formally, if $\mhb{\mt{\theta}} \conv \mb{\mt{\theta}}$ and $\mhb{\pi} \conv \mb{\pi}$ as $s \conv \infty$, then $\mh{L}_s \conv \mt{L}_*$ as $s\conv \infty$.  
 % Thus, $\mh{h}_s \conv \mt{h}_*$ as $s \conv \infty$.
 \end{proof}
 
-Similarly, let $\mh{L}_s'=L(\mh{h}_s')$ be the risk of the induced \emph{shuffled} graph Bayes plugin classifier using the training data $\mc{T}_s'$ to obtain maximum likelihood estimators for $\{\bth_y',\pi_y\}_{y \in \mc{Y}}$.  This yields
+Similarly, let $\mh{L}_s'=L(\mh{h}_s')$ be the risk of the induced \emph{shuffled} graph Bayes plugin classifier using the training data $\mc{T}_s'$ to obtain maximum likelihood estimators for $\{\theta_y',\pi_y\}_{y \in \mc{Y}}$.  This yields
 \begin{coro} \label{cor:Sh_Plug}
-	$\mh{L}_s' \conv L_*'$ as $s \conv \infty$.
+	$\mh{L}_s' \pconv L_*'$ as $s \conv \infty$.
 \end{coro}
 \begin{proof}
 	The above proof rests on the finitude of $\mc{G}_n$, which remains finite after shuffling (uniform or otherwise), and therefore, the above proof holds, replacing $L_*$ with $L_*'$.
 \end{proof}
 
 
-% one could simply take the shuffled graph data $\mc{T}_s'$, without using $\psi$ (as defined above), and estimate $\bth_y'$.  While silly (as we know that ), this procedure is still asymptotically optimal.  Let $\mh{L}_s'$ be the risk of the induced \emph{shuffled} graph Bayes plugin classifier obtaining maximum likelihood estimates from $\mc{T}_s'$ to obtain the plugin estimate for Eq. \eqref{eq:Sh_Plug}. As above,  it follows that
+% one could simply take the shuffled graph data $\mc{T}_s'$, without using $\psi$ (as defined above), and estimate $\theta_y'$.  While silly (as we know that ), this procedure is still asymptotically optimal.  Let $\mh{L}_s'$ be the risk of the induced \emph{shuffled} graph Bayes plugin classifier obtaining maximum likelihood estimates from $\mc{T}_s'$ to obtain the plugin estimate for Eq. \eqref{eq:Sh_Plug}. As above,  it follows that
 
-Thus while one could merely plug the shuffled graphs into $\bth_y'$, such a procedure is inadvisable.  Specifically, the above procedure does not  use the fact that all $\theta_{G_i'|y} = \theta_{G_j'|y}$ whenever $Q(G_i)=G_j$ for some $Q \in \mc{Q}$.  Instead, consider the risk $\mh{\mt{L}}_s=L(\mh{\mt{h}}_s)$ of the induced \emph{unlabeled} graph Bayes plugin classifier upon using the $\psi$ function to map each shuffled graph to its corresponding unlabeled graph, and then obtaining maximum likelihood estimates of the unlabeled graph parameters, $\mt{\bth}$.  
-\begin{coro} \label{cor:Sh_Plug}
-	$\mh{\mt{L}}_s \conv \mt{L}_*$ as $s \conv \infty$.
+Thus while one could merely plug the shuffled graphs into $\theta_y'$, such a procedure is inadvisable.  Specifically, the above procedure does not  use the fact that all $\theta_{G_i'|y} = \theta_{G_j'|y}$ whenever $Q(G_i)=G_j$ for some $Q \in \mc{Q}$.  Instead, consider the risk $\mh{\mt{L}}_s=L(\mh{\mt{h}}_s)$ of the induced \emph{unlabeled} graph Bayes plugin classifier upon using the $\psi$ function to map each shuffled graph to its corresponding unlabeled graph, and then obtaining maximum likelihood estimates of the unlabeled graph parameters, $\mt{\theta}$.  
+\begin{coro} \label{cor:Un_Plug}
+	$\mh{\mt{L}}_s \pconv \mt{L}_*$ as $s \conv \infty$.
 \end{coro}
 
 Because $|\mt{\mc{G}}_n| \ll |\mc{G}_n|$ (by a factor of approximately $n!$), it follows that although both $\mh{h}_s'$ and $\mh{\mt{h}}_s$ are universally consistent, $\mh{h}_s'$ will generally perform worse.  In fact, we have the following result:
 \begin{thm} \label{thm:inadmiss}
-	$\mh{h}_s'$ is inadmissible under $0-1$ loss. 
+	$\mh{h}_s$ dominates $\mh{h}_s'$. 
 \end{thm}
 \begin{proof}
-	Assume that there exists at least one unlabeled set $\mt{G}$ with two elements, $G_1, G_2$, such that $\mt{\theta}_{\mt{G}|y_i}\neq \mt{\theta}_{\mt{G}|y_j}$ for  $y_i \neq y_j$.  $\mh{h}'_s$ depends on estimating $\theta'_{G_1|y}$ and $\theta'_{G_2|y}$ for $y\in\mc{Y}$, whereas $\mh{\mt{h}}_s$ depends on only estimating $\mh{\mt{\theta}}_{\mt{G}|y}$ for $y \in \mc{Y}$. Now consider two scenarios.  In the first scenario, assume that all training data are $G_1$.  If the test shuffled graph is also $G_1$, the estimates, $\mh{\theta}'_{G_1|y}$ and $\mh{\mt{\theta}}_{\mt{G}|y}$ for $y \in \mc{Y}$, yield the same answer.  However, if the test shuffled graph is $G_2$, the shuffled plugin classifier $\mh{h}'_s$ will randomly assign a class, whereas the unshuffled plugin classifier $\mh{\mt{h}}_s$ will classify according to the maximum a posteriori class appropriately (and will have lower variance).  In the second scenario, training data include both $G_1$ and $G_2$.  
+	To see that $\mh{h}_s'$ is inadmissible with respect to $\mh{h}_s$ under $0-1$ loss with expected misclassification risk, it is sufficient to show that the expected distance between  $\hth_s$ and $\theta$ is smaller than that of $\hth_s'$ and $\theta$, for all $s$. Note that while the training data for $\hth_s$ is $\mc{T}_s$, the training data for $\hth_s'$ is $\mc{T}_s'$. We formalize this as follows:
+	\begin{subequations}
+	\begin{align}
+		\EE[\norm{\hth_s - \theta}_2^2] &\leq \EE[\norm{\hth_s - \theta}_2^2] \\
+		\EE[{\hth_s}\T \hth_s - 2 \theta\T \hth_s - \theta\T \theta ] &\leq 	\EE[(\hth_s')\T \hth_s - 2 \theta\T {\hth_s}' - \theta\T \theta ] \\
+		\VV[\hth_s] -2 \theta\T \EE[\hth_s] &\leq 	\VV[{\hth_s}'] -2 \theta\T \EE[{\hth_s}'] \\
+		\VV[\hth_s] -2 \theta\T\theta &\leq 	\VV[{\hth_s}'] -2 \theta\T\theta',
+	\end{align}
+\end{subequations}
+	where $\VV[\cdot]$ indicates the variance operator. That the final inequality is true follows from the following two results.  First, $\theta\T \theta' \leq \theta\T \theta$ because the parameter vectors necessarily have the same magnitude.  Second, the variance of $\theta_s'$ is necessarily no smaller than the variance of $\theta_s$, because $\theta_s'$ operates on the same input as $\theta_s$ does, except that it has been shuffled.
+% consider the following.  Assume that there exists at least one unlabeled graph $\mt{G}$ with two elements, $G_1, G_2$, such that $\mt{\theta}_{\mt{G}|y_i}\neq \mt{\theta}_{\mt{G}|y_j}$ for  $y_i \neq y_j$.  $\mh{h}'_s$ depends on estimating $\theta'_{G_1|y}$ and $\theta'_{G_2|y}$ for $y\in\mc{Y}$, whereas $\mh{\mt{h}}_s$ depends on only estimating $\mh{\mt{\theta}}_{\mt{G}|y}$ for $y \in \mc{Y}$. Now consider two scenarios.  In the first scenario, assume that all training data are $G_1$.  If the test shuffled graph is also $G_1$, the estimates, $\hth'_{G_1|y}$ and $\mh{\mt{\theta}}_{\mt{G}|y}$ for $y \in \mc{Y}$, yield the same answer.  However, if the test shuffled graph is $G_2$, the shuffled plugin classifier $\mh{h}'_s$ will randomly assign a class, whereas the unshuffled plugin classifier $\mh{\mt{h}}_s$ will classify according to the maximum a posteriori class appropriately (and will have lower variance).  In the second scenario, training data include both $G_1$ and $G_2$.  
+\end{proof}
 
-	
+\begin{coro} \label{cor:ht_dom}
+	$\mh{\mt{h}}_s$ dominates $\mh{h}_s'$. 	
+\end{coro}
+\begin{proof}
 % $\EE[\mh{L}_s'] \geq \EE[\mh{\mt{L}}_s]$ for all $s$.
-% 	The first inequality follows from $\mh{\theta}'_{G|y}$ converging to $\theta'_{G|y}$ slower than $\mh{\mt{\theta}}_{\mt{G}|y}$ converges to $\mt{\theta}_{\mt{G}|y}$.  Although $\theta'_{G|y}$ and  $\mt{\theta}_{\mt{G}|y}$ encode identical information, the dimensionality of the two differs drastically.  Specifically, $\mt{\theta}_{\mt{G}|y} \in \triangle_{\mt{d}_n}$ and $\theta'_{\mt{G}|y} \in \triangle_{d_n}$, and $\mt{d}_n \approx d_n/n!$.
-Moreover, if vertex labels are available, $\mh{\mt{h}}_s$ is also inadmissible under $0-1$ loss.  
+% 	The first inequality follows from $\hth'_{G|y}$ converging to $\theta'_{G|y}$ slower than $\mh{\mt{\theta}}_{\mt{G}|y}$ converges to $\mt{\theta}_{\mt{G}|y}$.  Although $\theta'_{G|y}$ and  $\mt{\theta}_{\mt{G}|y}$ encode identical information, the dimensionality of the two differs drastically.  Specifically, $\mt{\theta}_{\mt{G}|y} \in \triangle_{\mt{d}_n}$ and $\theta'_{\mt{G}|y} \in \triangle_{d_n}$, and $\mt{d}_n \approx d_n/n!$.
+The proof of this corollary is similar to the above proof, so we merely sketch it here.  Essentially, $\htth_s$ can borrow strength from all the shuffled graphs within an unlabeled graph, so its variance is smaller than the variance of $\hth_s'$.  
+% Moreover, if vertex labels are available, $\mh{\mt{h}}_s$ is also inadmissible under $0-1$ loss.  
 \end{proof}
 
 % \begin{proof}
@@ -415,9 +452,9 @@ Moreover, if vertex labels are available, $\mh{\mt{h}}_s$ is also inadmissible u
 \label{sec:a_practical_approach_to_unlabeled_graph_classification}
 
 
-Corollary \ref{cor:Sh_Plug} demonstrates that one can induce a universally consistent classifier $\mh{\mt{h}}_s$  using Eq. \eqref{eq:Sh_Plug}. Theorem \ref{thm:inadmiss} further shows that the performance of $\mh{\mt{h}}_s$ dominates $\mh{h}_s'$ under $0-1$ loss.  Yet, using $\mh{\mt{h}}_s$ is practically useless for two reasons.  First, it requires solving $s$ graph isomorphism problems. Unfortunately, there are no known algorithms for solving graph isomorphism problems with worst-case performance in only polynomial time \cite{Fortin1996}. Second, the number of parameters to estimate is super-exponential in $n$ ($\mt{d}_n \approx 2^{n^2}/n!$), and acceptable performance will typically require $s \gg \mt{d}_n$.  We can therefore not even store the parameter estimates for small graphs (e.g., $n=30$), much less estimate them.  
+Corollary \ref{cor:Sh_Plug} demonstrates that one can induce a universally consistent classifier $\mh{\mt{h}}_s$  using Eq. \eqref{eq:Sh_Plug}. Corollary \ref{cor:ht_dom} further shows that the performance of $\mh{\mt{h}}_s$ dominates $\mh{h}_s'$.  Yet, using $\mh{\mt{h}}_s$ is practically useless for two reasons.  First, it requires solving $s$ graph isomorphism problems. Unfortunately, there are no known algorithms for solving graph isomorphism problems with worst-case performance in only polynomial time \cite{Fortin1996}. Second, the number of parameters to estimate is super-exponential in $n$ ($\mt{d}_n \approx 2^{n^2}/n!$), and acceptable performance will typically require $s \gg \mt{d}_n$.  We can therefore not even store the parameter estimates for small graphs (e.g., $n=30$), much less estimate them.  
 % Specifically, using Eq. \eqref{eq:Sh_Plug} requires first enumerating  all $\mt{d}_n$ isomorphism sets, then determining in which isomorphism set the to-be-classified graph and each of the training graphs reside.  This approach is therefore, in general, impractical because the number of parameters to estimate, $\mt{d}_n$, is too large. 
-We therefore consider an alternative strategy.
+This motivates consideration of an alternative strategy.
 
 A $k_s$ nearest-neighbor classifier 
 using Euclidean norm distance
@@ -427,37 +464,54 @@ as long as $k_s \conv \infty$ with $k_s/s \conv 0$ as $s \conv \infty$ \cite{Sto
 \begin{align}
 	\delta(G_i,G_j)=\norm{A_i-A_j}_F^2,
 \end{align}
-where $A_i$ is the adjacency matrix representation of the labeled graph, $G_i$.  Letting $\mh{L}^{\delta}_s$ indicate the misclassification rate for the Frobenius norm $k_s$NN classifier, \cite{VP11_super} showed:
+where $A_i$ is the adjacency matrix representation of the labeled graph, $G_i$.  
+Let $\mh{h}_s^\delta$ denote the Frobenius norm $k_s$NN classifier on \emph{labeled} graphs using $\delta$, and let $\mh{L}^{\delta}_s$ indicate the misclassification rate for this classifier.  \cite{VP11_super} showed:
 \begin{thm} \label{thm:5}
-	$\mh{L}^{\delta}_s \conv L_*$ as $s \conv \infty$.
+	$\mh{L}^{\delta}_s \pconv L_*$ as $s \conv \infty$.
 \end{thm}
 \begin{proof}
 Because both $\mc{G}$ and $\mc{Y}$ have finite cardinality, the law of large numbers ensures that eventually as $s \conv \infty$, the plurality of nearest neighbors to a test graph will be identical to the test graph. 
 \end{proof}
-Let $\mh{L}^{\delta'}_s$ indicate the misclassification rate of the Frobenius-norm $k_s$NN on \emph{shuffled} graphs.  From the fact that the number of shuffled graphs is \emph{equal to} the number of labeled graphs,  the below corollary follows immediately:
-\begin{coro} \label{cor:1}
-	$\mh{L}^{\delta'}_s \conv L_*'$ as $s \conv \infty$.
+Let ${\mh{h}}^{'\delta}_s$ indicate the Frobenius-norm $k_s$NN on \emph{shuffled} graphs using $\delta$, and let $\mh{L}^{'\delta}_s$ indicate the misclassification rate for this classifier.  %Similarly, let ${\mh\mt{h}}^{\delta}_s$ and $\mh{\mt{L}}^{\delta}_s$ be the Frobenius-norm $k_s$NN on \emph{unlabeled} graphs using
+From above theorem, the fact that $|\mc{G}_n'|=|\mc{G}_n|$ (see Definition \ref{def:shuffled}), and Corollary \ref{cor:Sh_Plug},  the below follows immediately:
+\begin{coro} \label{cor:knn1}
+	$\mh{L}^{'\delta}_s \pconv L_*'$ as $s \conv \infty$.
 \end{coro}
-As mentioned above, the number of unlabeled graphs is vastly less than the number of labeled or shuffled graphs, $|\mt{\mc{G}}_n| \approx |\mc{G}_n|/n!$.  Therefore, given that we observed only labeled or shuffled graphs, but not unlabeled graphs, we consider the ``graph-matched Frobenius norm'' distance
+
+Given shuffled graph data $\mc{T}_s'$, however, other distance metrics appear more ``natural'' to us.  For example,  
+% As mentioned above, the number of unlabeled graphs is vastly less than the number of labeled or shuffled graphs, $|\mt{\mc{G}}_n| \approx |\mc{G}_n|/n!$.  Therefore, given that we observed only labeled or shuffled graphs, but not unlabeled graphs, we 
+consider the ``graph-matched Frobenius norm'' distance:
 \begin{align} \label{eq:d}
-\mt{\delta}(G_i',G_j')=\min_{Q \in \mc{Q}_n}\norm{Q(A_i')-A_j'}_F^2,	
+\delta'(G_i',G_j')=\min_{Q \in \mc{Q}_n}\norm{Q(A_i')-A_j'}_F^2,	
 \end{align}
-where $A_i'$ and $A_j'$ are shuffled adjacency matrices.  Let $\mh{L}^{\mt{\delta}}_s$ indicate the misclassification rate of the $k_s$NN classifier using the above graph-matched norm $\mt{\delta}$.  Given an exact graph matching function---a function that actually solves Eq. \eqref{eq:d}---we have the following result
+where $A_i'$ and $A_j'$ are shuffled adjacency matrices.  
+Let $\mh{h}^{'\delta'}_s$ indicate the misclassification rate of the $k_s$NN classifier using the above graph-matched norm $\delta'$ \emph{shuffled} graphs, and let $\mh{L}^{'\delta'}_s$ indicate the misclassification rate for this classifier.  Given an exact graph matching function---a function that actually solves Eq. \eqref{eq:d}---we have the following result:
 % we can use this as the distance in a $k_s$NN algorithm, referred to as the GM-$k_s$NN. 
 % The GM-$k_s$NN classifier for shuffled graphs proceeds as follows.  First, compute the graph-matched Frobenius norm distance between the test graph $G$ and all training graphs, $\{\delta_i=\delta(G,G_i)\}_{i \in [s]}$.  Second, order the graph/class pairs according to their distances, $\delta_{(1)} \leq \cdots \leq \delta_{(s)}$.  Finally, let the estimated class be the plurality class of the $k_s$ closest graphs; that is, $\mh{y}=\argmax_{y \in \mc{Y}} \sum_{i \in [k_s]} \II\{y_{(i)}=y\}$.   %Collectively, we refer to this classification strategy as \emph{graph-matched} $k_s$NN (GM-$k_s$NN).
-\begin{coro}
-	$\mh{L}^{\mt{\delta}}_s \conv \mt{L}_*$ as $s \conv \infty$.
+\begin{coro} \label{cor:Sh_knn}
+	$\mh{L}^{'\delta'}_s \pconv L_*'$ as $s \conv \infty$.
 \end{coro}
-Thus, given $\mc{T}_s'$, one could use either $\delta$ or $\mt{\delta}$ as part of a $k_s$NN classifier.  Analogous to the Bayes plugin results above, for the $k_s$NN classifiers, we have 
+Thus, given shuffled data $\mc{T}_s'$, one could consider either $\mh{h}_s^{\delta}$ or $\mh{h}_s^{'\delta'}$.  Analogous to the Bayes plugin results above, for the $k_s$NN classifiers, we have 
 \begin{thm} \label{thm:knninadmiss}
-	$\EE[\mh{L}^{\delta'}_s] \geq \EE[\mh{L}^{\mt{\delta}}_s] \geq \EE[\mh{L}^{\delta}_s]$ for all $s$. \end{thm}
+	$\mh{h}_s^{'\delta'}$ dominates $\mh{h}_s^{\delta}$ when data are \emph{shuffled} graphs.
+	% $\EE[\mh{L}^{\delta'}_s] \geq \EE[\mh{L}^{\mt{\delta}}_s], \EE[\mh{L}^{\delta}_s]$ for all $s$. 
+\end{thm}
 \begin{proof}
-	The first equality follows from the following consideration.  The $k_s$NN classifier using $\delta$ on shuffled graphs only benefits from graphs that have been shuffled identically, whereas the $k_s$NN using $\mt{\delta}$ benefits from all graphs within an equivalence class, regardless of how they have been shuffled.  The second equality.....
+	% The graph-matched classifier, $\mh{h}_s^{\mt{\delta}}$, however, borrows strength from all training shuffled graphs within the same isomorphism set as a test shuffled graph, whereas $\mh{h}_s^{\delta'}$ does not.  
+	The above domination follows from the following consideration:  
+	% Both $\mh{h}_s^{\delta}$ and $\mh{h}_s^{'\delta'}$ operate on $\mc{T}_s'$.  
+	$\mh{h}_s^{\delta'}$ only benefits from graphs that have been shuffled identically, whereas $\mh{h}_s^{'\delta'}$  benefits from all graphs within an equivalence class, regardless of how they have been shuffled. Therefore, $\mh{h}^{\delta}_s$ is inadmissible with respect to $\mh{h}_s^{'\delta'}$ under the expected risk of $0-1$ loss. \end{proof}
+% 	Moreover, if vertex label information is available, $\mh{h}^{\delta}_s$ is also inadmissible under $0-1$ loss.
 
-	Therefore, $\mh{L}^{\delta'}_s$ is inadmissible under $0-1$ loss. Moreover, if vertex label information is available, $\mh{L}^{\delta}_s$ is also inadmissible under $0-1$ loss.
-	
-\end{proof}
-Thus, when the training data consists of shuffled graphs, the best universally consistent classifier (of those considered herein) is a $k_s$NN that uses $\mt{\delta}$ as the distance metric.  Other universally consistent classifiers either require estimating more parameters than there are molecules in the universe, or are inadmissible under $0-1$ loss.  When vertex labels are available, none of the other universally consistent classifiers considered here outperforms the $k_s$NN classifier that uses the vertex labels. 
+Interestingly, when the data are labeled graphs, $\mc{T}_s$, one can outperform $\mh{h}_s^{\delta}$ by \emph{shuffling}, that is, by apparently destroying the label information.  Consider an example in which $\theta=\theta'$, such that no information is in the labels.  In such scenarios, shuffling can effectively borrow strength from different labeled graphs that are within the same unlabeled graph set. Let $\mh{h}^{\delta'}_s$ indicate the misclassification rate of the $k_s$NN classifier using $\delta'$ \emph{labeled} graphs, and let $\mh{L}^{\delta'}_s$ indicate the misclassification rate for this classifier. We therefore state without proof:
+\begin{thm} \label{thm:nodom}
+	Neither $\mh{h}_s^{\delta'}$ nor $\mh{h}_s^{\delta}$ dominates when data are \emph{labeled} graphs.
+	% $\EE[\mh{L}^{\delta'}_s] \geq \EE[\mh{L}^{\mt{\delta}}_s], \EE[\mh{L}^{\delta}_s]$ for all $s$. 
+\end{thm}
+
+
+
+Thus, when the training data consists of shuffled graphs, the best universally consistent classifier (of those considered herein) is a $k_s$NN that uses $\delta'$ as the distance metric.  Other universally consistent classifiers that we considered either require estimating more parameters than there are molecules in the universe, or are inadmissible under $0-1$ loss.  When vertex labels are available, no classifier dominates. 
 
 
 \subsection{Other Graph Invariants are Worse} % (fold)
@@ -470,19 +524,19 @@ The above theoretical results consider Bayes plug-in and $k_s$NN classifiers. He
 	\item \textbf{size:} number of edges in the graph
 	\item \textbf{maximum degree:} maximum number of edges incident to a vertex
 	\item \textbf{maximum eigenvalue:} maximum eigenvalue of adjacency matrix, an upper bound on the maximum average degree
-	\item \textbf{scan statistic:} maximum size of neighborhood of a vertex
+	\item \textbf{scan statistic:} maximum size of the neighborhood of a vertex
 	\item \textbf{number of triangles:} a triangle is a collection of three vertices that are connected
-	\item \textbf{clustering coefficient:} a measure of connected of the graph
+	\item \textbf{clustering coefficient:} a measure of connectedness of the graph
 	\item \textbf{average path length:} average number of edges one must traverse to travel from a vertex to any other vertex.
 \end{itemize}
-Via Monte Carlo \cite{PCP10} was unable to find a uniformly most powerful graph invariant (test statistic \cite{PCR10}) for a particular hypothesis testing scenario.  The above results, however, indicate that there exists optimal classifiers (or test statistics) for any setting.  %In particular, let $\mh{L}^{\psi}_s$ be the misclassification rate for any classifier induced from $\mc{T}_s'$, that is, only observing shuffled graphs.  
-Let $\mh{h}^{\mh{\pi}}_s$ be the \emph{chance} classifier, that is
+Via Monte Carlo \cite{PCP10} was unable to find a uniformly most powerful graph invariant (test statistic \cite{PCR10}) for a particular hypothesis testing scenario with unlabeled graphs.  The above results, however, indicate that there exists optimal classifiers (or test statistics) for any unlabeled or shuffled graph setting.  %In particular, let $\mh{L}^{\psi}_s$ be the misclassification rate for any classifier induced from $\mc{T}_s'$, that is, only observing shuffled graphs.  
+To proceed, let $\mh{h}^{\mh{\pi}}_s$ be the \emph{chance} classifier, that is
 \begin{align}
 	\mh{h}_s^{\mh{\pi}}(G)=\argmax_{y\in\mc{Y}} \mh{\pi}_y,
 \end{align}
-and let $\mh{L}^{\mh{\pi}}_s$ be the misclassification rate for this classifier.  From the above results, it follows that
-\begin{thm} \label{thm:knninadmiss2}
-	$\mh{L}^{\mh{\pi}}_s \geq \mh{L}^{\psi}_s \geq \mh{L}_s'=\mh{\mt{L}}_s = \mh{L}^{\delta'}_s=\mh{L}^{\mt{\delta}}_s=L_s'=\mt{L}_s$ as $s \conv \infty$. 
+and let $\mh{L}^{\mh{\pi}}_s$ be the misclassification rate for this classifier.  From the above results, it follows that:
+\begin{thm} \label{thm:order}
+	In expectation, \\ $\mh{L}^{\mh{\pi}}_s \geq \mh{L}^{\psi}_s \geq \mh{L}_s'=\mh{\mt{L}}_s = \mh{L}^{\delta'}_s=\mh{L}^{'\delta'}_s=L_s'=\mt{L}_s$ as $s \conv \infty$. 
 \end{thm}
 % and
 % \begin{coro}
@@ -517,9 +571,9 @@ We buttress the above theoretical results via numerical experiments.  Consider t
 \begin{itemize}
 	\item {$\delta$-$1$NN:}  A $1$-nearest neighbor ($1$NN) with Frobenius norm distance on the \emph{labeled} adjacency matrices.
 	\item {$\delta'$-$1$NN:} A $1$NN with Frobenius norm distance on the \emph{shuffled} adjacency matrices.
-	\item {$\mt{\delta}$-$1$NN:} A $1$NN with an \emph{inexact} graph-matched Frobenius norm distance on the shuffled adjacency matrices.  Because graph-matching is $\mc{NP}$-hard \cite{Garey1979}, we instead use an inexact graph matching approach based on the quadratic assignment formulation described in \cite{VP11_QAP}, which is only cubic in $n$.
-	\item {$\psi$-$1$NN:} A $1$NN with Euclidean distance using the seven graph invariants described above.  Prior to computing the Euclidean distance, for each invariant, we rescale all the values to lie between zero and one (to normalized scale).
-	\item {$\mh{\pi}$:} Classify all test graphs according to which ever class is more frequent in the training data.
+	\item {$\mt{\delta}$-$1$NN:} A $1$NN with an \emph{inexact} graph-matched Frobenius norm distance on the shuffled adjacency matrices.  Because graph-matching is $\mc{NP}$-hard \cite{Garey1979}, we instead use an inexact graph matching approach based on the quadratic assignment formulation described in \cite{VP11_QAP}, which only requires $\mc{O}(n^3)$ time.
+	\item {$\psi$-$1$NN:} A $1$NN with Euclidean distance using the seven graph invariants described above.  Prior to computing the Euclidean distance, for each invariant, we rescale all the values to lie between zero and one.
+	\item {$\mh{\pi}$:} Use the chance classifier defined above.
 \end{itemize}
 Performance is assessed by misclassification rate.
 
@@ -576,10 +630,10 @@ Performance is assessed by misclassification rate.
 \label{sub:connectome_classification}
 
 % Emboldened by the simulated performance of our unlabeled graph classifier, we decided to try it on a real-world application.  
-A ``connectome'' is a brain-graph in which vertices correspond to (groups of) neurons, and edges correspond to connections between them.  Diffusion Magnetic Resonance (MR) Imaging and related technologies are making the acquisition of MR connectomes routine \cite{Hagmann2010}.  49 subjects from the Baltimore Longitudinal Study on Aging comprise this data, with acquisition and connectome inference details as reported in \cite{Gray11}.  Each connectome yields a $70$ vertex simple graph (binary, symmetric, and hollow adjacency matrix).  Associated with each graph is class label based on the gender of the individual (24 males, 25 females).  Because the vertices are labeled, we can compare the results of having the labels and not having the labels.  
+A ``connectome'' is a brain-graph in which vertices correspond to (groups of) neurons, and edges correspond to connections between them.  Diffusion Magnetic Resonance (MR) Imaging and related technologies are making the acquisition of MR connectomes routine \cite{Hagmann2010}.  49 subjects from the Baltimore Longitudinal Study on Aging comprise this data, with acquisition and connectome inference details as reported in \cite{Gray11}.  Each connectome yields a $70$ vertex simple graph (binary, symmetric, and hollow adjacency matrix).  Associated with each graph is class label based on the sex of the individual (24 males, 25 females).  Because the vertices are labeled, we can compare the results of having the labels and not having the labels.  
 
-Figure \ref{fig:1} confirms the above theoretical results in a particular finite sample regime.  We apply the five algorithms discussed above to sub-samples of the connectome data, which shows approximate convergence rates for this data.  Fortunately, this real data example supports the main theorems of this work.  Specifically, the $k_s$NN classifier using $\delta$ on the \emph{labeled} graphs achieves the lowest misclassification rate, as suggested must be by Theorem \ref{thm:knninadmiss} (dashed gray line).  Moreover, as suggested by 
-Theorem \ref{thm:knninadmiss2},
+Figure \ref{fig:1} reifies the above theoretical results in a particular finite sample regime.  We apply the five algorithms discussed above to sub-samples of the connectome data, which shows approximate convergence rates for this data.  Fortunately, this real data example supports the main theorems of this work.  Specifically, the $k_s$NN classifier using $\delta$ on the \emph{labeled} graphs (dashed gray line) achieves the lowest misclassification rate for all $s$, which one would expect if labels contain appropriate class signal.  Moreover, as suggested by 
+Theorem \ref{thm:knninadmiss},
 the $k_s$NN classifier using the inexact graph-matching Frobenius norm on the shuffled adjacency matrices, $\mt{\delta}$, performs best of all classifiers using only shuffled graphs (compare dashed black line with solid black and gray lines).  On the other hand, while the $k_s$NN classifier using the Frobenius norm on shuffled graphs, $\delta'$, must eventually converge to $L_s'$, its convergence rate is quite slow, so the classifier using standard invariants $\psi$ outperforms the simple $\delta'$ based $k_s$NN.
 
 
@@ -626,7 +680,9 @@ the $k_s$NN classifier using the inexact graph-matching Frobenius norm on the sh
 
 \section{Discussion}
 
-In this work, we address both the theoretical and practical limitations of classifying shuffled graphs, relative to labeled and unlabeled graphs.  Specifically, we show that shuffling the vertex labels results in an irretrievable situation, with a possible degradation of classification performance (Theorem \ref{thm:1}). Even if the vertex labels contained class-conditional signal, Bayes performance may remain unchanged (Theorem \ref{thm:2}).  Moreover, although one cannot hope to recover the vertex labels, one can obtain a Bayes optimal classifier by solving a large number of graph isomorphism problems (Theorem \ref{thm:3}).  This resolves a theoretical conundrum: is there a set of graph invariants that can yield a universally consistent graph classifier?  When the generative distribution is unavailable, one can induce a consistent and efficient ``unshuffling'' classifier by using a graph-matching strategy (Theorem \ref{thm:4}).  Unfortunately, this is intractable in practice due to the difficulty of graph matching and the large number of isomorphism sets.  Instead, a Frobenius norm $k_s$NN classifier applied to the adjacency matrices may be used, which is also universally consistent (Corollary \ref{cor:1}).   Convergence rates may be considerably sped up by using a graph-matching Frobenius norm (Theorem \ref{thm:inadmiss}).  Because graph-matching is $\mc{NP}$-hard, we instead use an approximate graph-matching algorithm in practice (see \cite{VP11_QAP} for details).  Applying these $k_s$NN classifiers to a problem of considerable scientific interest---classifying human MR connectomes---we find that even with a relatively small sample ($s \geq 20$), the approximately graph-matched $k_s$NN algorithm performs nearly as well as the $k_s$NN algorithm \emph{using} vertex labels, and slightly better than a $k_s$NN algorithm applied to a set of graph invariants proposed previously \cite{PCP10}.  Thus, this theoretical insight has led us to improved practical classification performance.  Extensions to weighted or (certain) attributed graphs are straightforward.
+In this work, we address both the theoretical and practical limitations of classifying shuffled graphs, relative to labeled and unlabeled graphs.  Specifically, first we construct the notion of shuffled graphs and shuffled graph classifiers in a parallel fashion with labeled and unlabeled graphs/classifiers, as we were unable to find such notions in the literature.  Then, we show that shuffling the vertex labels results in an irretrievable situation, with a possible degradation of classification performance (Theorem \ref{thm:1}). Even if the vertex labels contained class-conditional signal, Bayes performance may remain unchanged (Theorem \ref{thm:2}).  Moreover, although one cannot hope to recover the vertex labels, one can obtain a Bayes optimal classifier by solving a large number of graph isomorphism problems (Theorem \ref{thm:3}).  This resolves a theoretical conundrum: is there a set of graph invariants that can yield a universally consistent graph classifier?  When the generative distribution is unavailable, one can induce a consistent and efficient ``unshuffling'' classifier by using a graph-matching strategy (Corollary \ref{cor:Un_Plug}).  While this unshuffling approach dominates the more na\"ive approach (Theorem \ref{thm:inadmiss}), it is intractable in practice due to the difficulty of graph matching and the large number of isomorphism sets.  Instead, a Frobenius norm $k_s$NN classifier applied to the adjacency matrices may be used, which is also universally consistent (Corollary \ref{cor:Sh_knn}).  Convergence rates may be considerably sped up by using a graph-matching Frobenius norm (Theorem \ref{thm:knninadmiss}).  Surprisingly, none of the considered classifiers dominate the other for labeled data (Theorem \ref{thm:nodom}), yet asymptotically, we can order shuffled graph classifiers (Theorem \ref{thm:order}).
+
+Because graph-matching is $\mc{NP}$-hard, we instead use an approximate graph-matching algorithm in practice (see \cite{VP11_QAP} for details).  Applying these $k_s$NN classifiers to a problem of considerable scientific interest---classifying human MR connectomes---we find that even with a relatively small sample size ($s \geq 20$), the approximately graph-matched $k_s$NN algorithm performs nearly as well as the $k_s$NN algorithm \emph{using} vertex labels, and slightly better than a $k_s$NN algorithm applied to a set of graph invariants proposed previously \cite{PCP10}.  This suggests that the asymptotics might kick in even for very small sample sizes.  Thus, this theoretical insight has led us to improved practical classification performance.  Extensions to weighted or (certain) attributed graphs are straightforward.
 
 % estimating them yields an asymptotically optimal classifier.  This suggest that efforts to estimate the vertex labels may yield useful classification results, outperforming ``standard'' graph-invariant based classifiers.  Via simulation we show that an approximate graph matching algorithm converges to the optimal performance with only about 500 training samples for a particular independent edge random graph model.   Finally, we demonstrate with connectome data that estimating the vertex labels can be useful, but that there remains room to grow to exceed misclassification performance of a carefully chosen graph invariant $\circ$ machine learning based approach on this data.   These connectome data, much like other collections of graphs, can also be equipped with both vertex and edge attributes.  As such, we hope to extend the results herein to consider the more general cases.
 

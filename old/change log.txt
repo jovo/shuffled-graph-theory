@@ -1,0 +1,35 @@
+change log:
+
+-- added defs 1-3
+
+-- added last sentence of 2.2
+
+-- added parenthetical comment after introducing training data in 5
+
+-- added sentence before thm 4 to explain that Lhat_s is a r.v.
+
+-- thm 4, cor 1 & 2: make convergence in p
+
+-- thm 5: changed, and added corollary 3
+
+-- defined 3 h^delta functions where we introduce their L
+
+-- thm 6, cor 4 & 5: convergence in p
+
+
+right before thm 7, define h
+
+thm 5: inadmissable
+
+thm 7: Edelta' \geq Edeltatidle for all s.
+or
+hdeltatilde dominates hdelta'
+
+proof: deltatilda borrows strength.
+
+now, given T, consider delta or deltatilde.  sometimes deltatilde 
+(perhaps state without proof) 
+
+
+
+classifier --> rule whenever appropriate.

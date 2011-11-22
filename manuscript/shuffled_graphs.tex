@@ -334,7 +334,7 @@ Let $\psi$ indicate in which equivalence set $G$ resides; that is,  $\psi(G)=\mt
 Section \ref{sec:shuffle} shows that one cannot fruitfully ``unshuffle'' graphs: once they have been shuffled by a uniform shuffler, any label information is lost.  Section \ref{sec:gi} shows that if graphs have been uniformly shuffled, there is a relatively straightforward algorithm for optimal classification. However, that classifier depends on knowing the parameters.
 %, $\mt{\theta}=\{\mt{\theta}_y\}_{y\in \mc{Y}}$ and $\mb{\pi}=\{\pi_y\}_{y \in \mc{Y}}$. 
 When the parameters are unknown (effectively always), we assume that the data are sampled identically and independently from some unknown joint distribution: $(\QQ_i(\GG_i),Y_i)\overset{iid}{\sim}\PP_{\QQ,\GG,Y}$.  
-For \emph{labeled} graph classification, $\PP_{\QQ}$ is assumed to be the identity function, therefore, $\mc{T}_s=\{(\GG_i,Y_i)\}_{i \in [s]}$, because $\QQ_i(\GG_i)=\GG_i$ when graphs are labeled.
+For \emph{labeled} graph classification, $\PP_{\QQ}$ is assumed to be the identity function, therefore, $\mc{T}_s=\{(\GG_i,Y_i)\}_{i \in [s]}$, because when graphs are labeled $\QQ_i(\GG_i)=\GG_i$.
 % the training data are $\mc{T}_s=\{(\GG_i,Y_i)\}_{i \in [s]}$, where $[s]=\{1,\ldots,s\}$ (because $\QQ_i$ is assumed to be a known point mass).  
 For \emph{shuffled} graph classification $\PP_{\QQ}$ is assumed to be uniform over the permutation matrices, so that all label information is both unavailable and irrecoverable.  The training data are therefore $\mc{T}_s'=\{(\GG_i',Y_i)\}_{i \in [s]}$, where $\GG_i'=\QQ_i(\GG_i)$.  For \emph{unlabeled} graph classification the training data are again $\mc{T}_s'$. 
 %We assume that $\PP_{\QQ}$ is uniform, so that all label information is both unavailable and irrecoverable.  
@@ -368,7 +368,7 @@ estimates the parameters $\{\theta_y',\pi_y\}_{y \in \mc{Y}}$ using the training
 \end{align}
 
 An \emph{unlabeled} graph Bayes plugin classifier,
-$\mh{\mt{h}}_s: \mt{\mc{G}}_n \times \mc{T}_s' \to \mc{Y}$,
+$\mh{\mt{h}}_s: \mc{G}_n \times \mc{T}_s' \to \mc{Y}$,
 first determines in which unlabeled set each shuffled graph resides, using $\psi$ as defined in Section \ref{sec:gi}.  Then, it estimates the parameters $\{\mt{\theta}_{\psi(G')|y}\}_{y \in \mc{Y}}$ and $\{\pi_y\}_{y \in \mc{Y}}$ using the training data $\mc{T}_s'$. Finally, it plugs those estimates into the unlabeled Bayes classifier, Eq. \eqref{eq:Un_Bayes}, resulting in
 \begin{align} \label{eq:Sh_Plug}
 	\mh{\mt{h}}_s(G)=\argmax_{y\in\mc{Y}} \mh{\mt{\theta}}_{\mt{G}|y}\mh{\pi}_y.

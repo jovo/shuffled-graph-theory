@@ -300,7 +300,7 @@ The above result demonstrates that even when the labels \emph{do} carry some cla
 .  Shuffling has the effect of ``flattening'' likelihoods within isomorphism sets, from $\theta_y$ to $\theta_y'$, so that $\theta_y'$ satisfies $\{\theta_{G|y}'=\mt{\theta}_{\mt{G}|y}/|\mt{G}| \, \forall \colon G \in \mt{G}\}$.  But just because the shuffling changes class-conditional likelihoods does \emph{not} mean that Bayes risk must also change. This result follows immediately upon realizing that posteriors can change without classification performance changing.  The above results are easily extended to consider non-equal class priors and $c$-class classification problems.  To see this, ignoring ties, simply replace each minimum likelihood with a sum over all non-maximum posteriors: 
 % $$\min_y \PP_y(G) \to \sum_{y \in \mc{Y}'} \PP_y(G) \text{ where } \mc{Y}' =\{y : y \neq \argmax_y \PP_y\}.$$
 \begin{multline}
-\min_y \theta_{G|y} \pi_y \mapsto \sum_{y \in \mc{Y}'} \theta_{G|y} \pi_y \\ \text{ where } \mc{Y}' =\{y \colon y \neq \argmax_y \theta_{G|y}\}.
+\min_y \theta_{G|y} \pi_y \mapsto \sum_{y \in \mc{Y}'} \theta_{G|y} \pi_y \\ \text{ where } \mc{Y}' =\{y \colon y \neq \argmax_y \theta_{G|y} \pi_y\}.
 \end{multline}
 
 \subsection{Bayes Optimal Graph Invariant Classification After Shuffling} % (fold)
@@ -436,14 +436,22 @@ Because $|\mt{\mc{G}}_n| \ll |\mc{G}_n|$ (by a factor of approximately $n!$), it
 % \end{proof}
 
 \begin{thm} \label{thm:tdomp}
-	$\mh{\mt{h}}_s$ dominates $\mh{h}_s'$. 	
+	$\mh{\mt{h}}_s$ dominates $\mh{h}_s'$ for \emph{shuffled} graph data. 	
 \end{thm}
 \begin{proof}
-% $\EE[\mh{L}_s'] \geq \EE[\mh{\mt{L}}_s]$ for all $s$.
-% 	The first inequality follows from $\hth'_{G|y}$ converging to $\theta'_{G|y}$ slower than $\mh{\mt{\theta}}_{\mt{G}|y}$ converges to $\mt{\theta}_{\mt{G}|y}$.  Although $\theta'_{G|y}$ and  $\mt{\theta}_{\mt{G}|y}$ encode identical information, the dimensionality of the two differs drastically.  Specifically, $\mt{\theta}_{\mt{G}|y} \in \triangle_{\mt{d}_n}$ and $\theta'_{\mt{G}|y} \in \triangle_{d_n}$, and $\mt{d}_n \approx d_n/n!$.
-% The proof of this corollary is similar to the above proof, so we merely sketch it here.  
-Because $\htth_s$ can borrow strength from all the shuffled graphs within an unlabeled graph, its variance is smaller than the variance of $\hth_s'$.  
-% Moreover, if vertex labels are available, $\mh{\mt{h}}_s$ is also inadmissible under $0-1$ loss.  
+% Because $\htth_s$ can borrow strength from all the shuffled graphs within an unlabeled graph, its variance is smaller than the variance of $\hth_s'$.  
+Consider the scalar $\mt{\theta}_{\mt{G}|y}$ decomposed into the vector $(\mt{\theta}_{G_1|y},\ldots,\mt{\theta}_{G_{|\mt{G}|}|y})$, where each $\mt{\theta}_{G_i|y}=\mt{\theta}_{\mt{G}|y}/|\mt{G}|$. Note that each $\mt{\theta}_{G_i|y} = \theta'_{G_i|y}$.  Yet, the estimators, $\mh{\mt{\theta}}_{G_i|y}$ and $\mh{\theta}'_{G_i|y}$ are not equal, because the former can borrow strength from all shuffled graphs within the same unlabeled graph, but the latter does not.  Assuming without loss of generality that the class priors are equal and known, the above domination claim is equivalent to stating that for each $G$,
+\begin{multline}
+	\PP[\argmax_{y \in \mc{Y}} \mh{\mt{\theta}}_{G|y} \neq \argmax_{y \in \mc{Y}} \mt{\theta}_{G|y} | \mc{T}_s'] \leq \\ \PP[\argmax_{y \in \mc{Y}} \mh{\theta}'_{G|y}  \neq \argmax_{y \in \mc{Y}} \theta'_{G|y} | \mc{T}_s'].
+\end{multline}
+Because $\mt{\theta}_{G|y}=\theta'_{G|y}$, the only difference between the two sides of the above inequality is the estimators.  We know that the estimators have the following distributions:
+\begin{subequations}
+\begin{align}
+	s_{\mt{G}} \mh{\mt{\theta}}_{G|y} \sim \text{Binomial}(\mt{\theta}_{G|y}, s_{\mt{G}}) \\
+	s_G \mh{\theta}_{G|y} \sim \text{Binomial}(\mt{\theta}_{G|y}, s_{G}),
+\end{align}
+\end{subequations}
+where $s_{\mt{G}}$ is the number of observations of any $G \in \mt{G}$ in the training data, and $s_G$ is the number of observations of $G$ in the training data.  From this, we see that for each $G$, $\mh{\mt{\theta}}_{G|y}$ will have a tighter concentration around the truth due to is borrowing strength, so our result holds. 
 \end{proof}
 
 % \begin{proof}
@@ -478,12 +486,11 @@ Let $\mh{h}_s^\delta$ denote the Frobenius norm $k_s$NN classifier on \emph{labe
 \begin{proof}
 Because both $\mc{G}$ and $\mc{Y}$ have finite cardinality, the law of large numbers ensures that eventually as $s \conv \infty$, the plurality of nearest neighbors to a test graph will be identical to the test graph. 
 \end{proof}
-Let ${\mh{h}}^{'\delta}_s$ indicate the Frobenius-norm $k_s$NN on \emph{shuffled} graphs using $\delta$, and let $\mh{L}^{'\delta}_s$ indicate the misclassification rate for this classifier.  %Similarly, let ${\mh\mt{h}}^{\delta}_s$ and $\mh{\mt{L}}^{\delta}_s$ be the Frobenius-norm $k_s$NN on \emph{unlabeled} graphs using
-From above theorem, the fact that $|\mc{G}_n'|=|\mc{G}_n|$ (see Definition \ref{def:shuffled}), and Corollary \ref{cor:Sh_Plug},  the below follows immediately:
+Let $\mh{h}_s^{'\delta}$ denote the Frobenius norm $k_s$NN classifier on \emph{shuffled} graphs using $\delta'$, and let $\mh{L}^{'\delta'}_s$ indicate the misclassification rate for this classifier.   %Similarly, let ${\mh\mt{h}}^{\delta}_s$ and $\mh{\mt{L}}^{\delta}_s$ be the Frobenius-norm $k_s$NN on \emph{unlabeled} graphs using
+From above theorem and Corollary \ref{cor:Sh_Plug},  the below follows immediately:
 \begin{coro} \label{cor:knn1}
 	$\mh{L}^{'\delta}_s \pconv L_*'$ as $s \conv \infty$.
 \end{coro}
-
 Given shuffled graph data $\mc{T}_s'$, however, other distance metrics appear more ``natural'' to us.  For example,  
 % As mentioned above, the number of unlabeled graphs is vastly less than the number of labeled or shuffled graphs, $|\mt{\mc{G}}_n| \approx |\mc{G}_n|/n!$.  Therefore, given that we observed only labeled or shuffled graphs, but not unlabeled graphs, we 
 consider the ``graph-matched Frobenius norm'' distance:
@@ -499,14 +506,16 @@ Let $\mh{h}^{'\delta'}_s$ indicate the misclassification rate of the $k_s$NN cla
 \end{coro}
 Thus, given shuffled data $\mc{T}_s'$, one could consider either $\mh{h}_s^{\delta}$ or $\mh{h}_s^{'\delta'}$.  Analogous to the Bayes plugin results above, for the $k_s$NN classifiers, we have 
 \begin{thm} \label{thm:knninadmiss}
-	$\mh{h}_s^{'\delta'}$ dominates $\mh{h}_s^{\delta}$ when data are \emph{shuffled} graphs.
+	$\mh{h}_s^{'\delta'}$ dominates $\mh{h}_s^{'\delta}$.
 	% $\EE[\mh{L}^{\delta'}_s] \geq \EE[\mh{L}^{\mt{\delta}}_s], \EE[\mh{L}^{\delta}_s]$ for all $s$. 
 \end{thm}
 \begin{proof}
-	% The graph-matched classifier, $\mh{h}_s^{\mt{\delta}}$, however, borrows strength from all training shuffled graphs within the same isomorphism set as a test shuffled graph, whereas $\mh{h}_s^{\delta'}$ does not.  
-	The above domination follows from the following consideration:  
-	% Both $\mh{h}_s^{\delta}$ and $\mh{h}_s^{'\delta'}$ operate on $\mc{T}_s'$.  
-	$\mh{h}_s^{\delta'}$ only benefits from graphs that have been shuffled identically, whereas $\mh{h}_s^{'\delta'}$  benefits from all graphs within an equivalence class, regardless of how they have been shuffled. Therefore, $\mh{h}^{\delta}_s$ is inadmissible with respect to $\mh{h}_s^{'\delta'}$ under the expected risk of $0-1$ loss. \end{proof}
+	% The above domination follows from the following consideration:  
+	Both $\mh{h}_s^{\delta}$ and $\mh{h}_s^{'\delta'}$ operate on $\mc{T}_s'$, that is, shuffled graph data.  Let $knn_{\delta}(G')$ be the collection of $k_s$ nearest neighbors of $G'$ using $\delta$ as the distance metric.  Let $knn_{\delta'}(G')$ be the same except using $\delta'$ as the distance metric.  Let $\{G_i\}_{\forall y_i=y_{G'}}$ indicate the set of training graphs with the same class label as the test graph, $G'$.  
+	
+	  
+	% $\mh{h}_s^{\delta'}$ only benefits from graphs that have been shuffled identically, whereas $\mh{h}_s^{'\delta'}$  benefits from all graphs within an equivalence class, regardless of how they have been shuffled. Therefore, $\mh{h}^{\delta}_s$ is inadmissible with respect to $\mh{h}_s^{'\delta'}$ under the expected risk of $0-1$ loss. 
+\end{proof}
 % 	Moreover, if vertex label information is available, $\mh{h}^{\delta}_s$ is also inadmissible under $0-1$ loss.
 
 Interestingly, when the data are labeled graphs, $\mc{T}_s$, one can outperform $\mh{h}_s^{\delta}$ by \emph{shuffling}, that is, by apparently destroying the label information.  Consider an example in which $\theta=\theta'$, such that no information is in the labels.  In such scenarios, shuffling can effectively borrow strength from different labeled graphs that are within the same unlabeled graph set. Let $\mh{h}^{\delta'}_s$ indicate the misclassification rate of the $k_s$NN classifier using $\delta'$ \emph{labeled} graphs, and let $\mh{L}^{\delta'}_s$ indicate the misclassification rate for this classifier. We therefore state without proof:

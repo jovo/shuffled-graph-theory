@@ -511,10 +511,12 @@ Thus, given shuffled data $\mc{T}_s'$, one could consider either $\mh{h}_s^{\del
 \end{thm}
 \begin{proof}
 	% The above domination follows from the following consideration:  
-	Both $\mh{h}_s^{\delta}$ and $\mh{h}_s^{'\delta'}$ operate on $\mc{T}_s'$, that is, shuffled graph data.  Let $knn_{\delta}(G')$ be the collection of $k_s$ nearest neighbors of $G'$ using $\delta$ as the distance metric.  Let $knn_{\delta'}(G')$ be the same except using $\delta'$ as the distance metric.  Let $\{G_i\}_{\forall y_i=y_{G'}}$ indicate the set of training graphs with the same class label as the test graph, $G'$.  
-	
-	  
-	% $\mh{h}_s^{\delta'}$ only benefits from graphs that have been shuffled identically, whereas $\mh{h}_s^{'\delta'}$  benefits from all graphs within an equivalence class, regardless of how they have been shuffled. Therefore, $\mh{h}^{\delta}_s$ is inadmissible with respect to $\mh{h}_s^{'\delta'}$ under the expected risk of $0-1$ loss. 
+	Both $\mh{h}_s^{\delta}$ and $\mh{h}_s^{'\delta'}$ operate on $\mc{T}_s'$, that is, shuffled graph data.  Let $k$NN$_{\delta}(G')$ be the collection of $k_s$ nearest neighbors of $G'$ using $\delta$ as the distance metric.  Let $k$NN$_{\delta'}(G')$ be the same except using $\delta'$ as the distance metric.  Let $\{G_i\}_{\forall y_i=y_{G'}}$ indicate the set of training graphs with the same class label as the test graph, $G'$.  The above theorem follows from the following inequality:
+\begin{align}
+|k\text{NN}_{\delta}(G') \cap \{G_i\}_{\forall y_i=y_{G'}}| \leq |k\text{NN}_{\delta'}(G') \cap \{G_i\}_{\forall y_i=y_{G'}}|,
+\end{align}
+	from which our result follows.
+	  	% $\mh{h}_s^{\delta'}$ only benefits from graphs that have been shuffled identically, whereas $\mh{h}_s^{'\delta'}$  benefits from all graphs within an equivalence class, regardless of how they have been shuffled. Therefore, $\mh{h}^{\delta}_s$ is inadmissible with respect to $\mh{h}_s^{'\delta'}$ under the expected risk of $0-1$ loss. 
 \end{proof}
 % 	Moreover, if vertex label information is available, $\mh{h}^{\delta}_s$ is also inadmissible under $0-1$ loss.
 

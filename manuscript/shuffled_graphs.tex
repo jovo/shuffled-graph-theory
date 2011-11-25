@@ -63,9 +63,9 @@ statistical inference, graph theory, network theory, structural pattern recognit
 
 \section{Introduction} \label{sec:1}
 
-\IEEEPARstart{R}{epresenting} data as graphs is becoming increasingly popular, as technological progress facilitates measuring ``connectedness'' in a variety of domains, including social networks, trade-alliance networks, and brain networks.  While the theory of pattern recognition is deep \cite{Devroye1996}, previous theoretical efforts regarding pattern recognition almost invariably assumed data are collections of vectors.  Here, we assume data are collections of graphs (where each graph is a set of vertices and a set of edges connecting the vertices).  For some data sets, the vertices of the graphs are \emph{labeled}, that is, one can identify the vertex of one graph with a vertex of the others.  For others, the labels are unobserved and/or assumed to not exist.  We investigate the theoretical and practical implications of the absence of vertex labels.  
+\IEEEPARstart{R}{epresenting} data as graphs is becoming increasingly popular, as technological progress facilitates measuring ``connectedness'' in a variety of domains, including social networks, trade-alliance networks, and brain networks.  While the theory of pattern recognition is deep \cite{Devroye1996}, previous theoretical efforts regarding pattern recognition almost invariably assumed data are collections of vectors.  Here, we assume data are collections of graphs (where each graph is a set of vertices and a set of edges connecting the vertices).  For some data sets, the vertices of the graphs are \emph{labeled}, that is, one can identify the vertex of one graph with a vertex of the others (note that this is a special case of assuming vertices are colored, where each vertex has a unique color).  For others, the labels are unobserved and/or assumed to not exist.  We investigate the theoretical and practical implications of the absence of vertex labels.  
 
-These implications are especially important in the emerging field of ``connectomics'', the study of connections of the brain \cite{Hagmann05, Sporns2010}.  In connectomics, one represents the brain as a graph (a brain-graph), where vertices correspond to (groups of) neurons and edges correspond to connections between them.  In the lower part of the evolutionary hierarchy (e.g., worms and flies), many neurons have been assigned labels \cite{WhiteBrenner86}.  However, for even the simplest vertebrates, vertex labels are mostly unavailable when vertices correspond to neurons.  
+These implications are especially important in the emerging field of ``connectomics'', the study of connections of the brain \cite{Hagmann05, Sporns2010}.  In connectomics, one represents the brain as a graph (a brain-graph), where vertices correspond to (groups of) neurons and edges correspond to connections between them.  In the lower tiers of the evolutionary hierarchy (e.g., worms and flies), many neurons have been assigned labels \cite{WhiteBrenner86}.  However, for even the simplest vertebrates, vertex labels are mostly unavailable when vertices correspond to neurons.  
 
 Classification of brain-graphs is poised to become increasingly popular.  Although previous work has demonstrated some possible strategies of graph classification in both the labeled \cite{VP11_sigsub} and unlabeled \cite{Duin2011} scenarios, relatively little work has compared the theoretical limitations of the two.  We therefore develop a random graph model amenable to such theoretical investigations.  The theoretical results lead to practical universally consistent graph classification algorithms.  We demonstrate that these algorithms have desirable finite sample properties via a real brain-graph classification problem of significant scientific interest: sex classification.
 
@@ -128,8 +128,9 @@ Note that one can think of a labeled graph as a shuffled graph for which $\QQ$ i
 
 % subsection an_unlabeled_graph_classification_model (end)
 
-Let $\mt{\mc{G}}_n$ be the collection of isomorphism sets.
-An \emph{unlabeled graph} $\mt{G}$ is an element of $\mt{\mc{G}}_n$. The number of unlabeled graphs on $n$ vertices is $|\mt{\mc{G}}_n|=\mt{d}_n \approx d_n/n!$ (see \cite{A000088} and references therein).
+The above shuffling view is natural whenever the vertices of the collection of graphs share a set of labels, but the labeling function is unknown.   However, when the vertices of the collection of graphs have different labels, perhaps a different view is more natural.
+
+An \emph{unlabeled graph} $\mt{G}$ is the collection of graphs isomorphic to one another, that is, $\mt{G}=\{Q(G)\}_{Q \in \mc{Q}_n}$. Let $\mt{G}$ be an element of the collection of graph isomorphism sets $\mt{\mc{G}}_n$. The number of unlabeled graphs on $n$ vertices is $|\mt{\mc{G}}_n|=\mt{d}_n \approx d_n/n!$ (see \cite{A000088} and references therein).
 % , and $|\mt{\mc{G}}_n|=\mt{d}_n$.  
 An \emph{unlabeling function} $U\colon \mc{G}_n \to \mt{\mc{G}}_n$ is a function that takes as input a graph and outputs the corresponding unlabeled graph. 
 \begin{defi}
@@ -260,6 +261,8 @@ The three Bayes optimal graph classifiers can be written explicitly in terms of 
 \section{Theoretical Implications of Shuffling} % (fold)
 \label{sec:theoretical_results}
 
+As mentioned above, we assume independent and uniform shuffling throughout.
+
 % section theoretical_results (end)
 \subsection{Shuffling Can Degrade Optimal Performance} % (fold)
 \label{sec:shuffle}
@@ -297,7 +300,7 @@ An immediate consequence of the above proof is that the inequality in the statem
 	$$\min_y \mt{\theta}_{\mt{G}|y} > \sum_{G \in \mt{G}}\min_y \theta_{G|y}.$$
 \end{thm}
 The above result demonstrates that even when the labels \emph{do} carry some class-conditional signal, it may be the case that shuffling or unlabeling does not degrade performance.  In other words, the following two statements are equivalent: (i) the labels contain information with regard to the classification task, and (ii) some graphs within an isomorphism set are class-conditionally more likely than others: $\exists \, \theta_{G_i|y} \neq \theta_{G_j|y}$ where $\Qs(G_i)=G_j$ for some $G_i,G_j \in \mc{G}_n$, $\Qs \in \mc{Q}_n$, and $y \in \mc{Y}$%, and that $\theta_{G_i|y}\neq \theta_{G_i|y'}$ or $\theta_{G_j|y}\neq \theta_{G_j|y'}$
-.  Shuffling has the effect of ``flattening'' likelihoods within isomorphism sets, from $\theta_y$ to $\theta_y'$, so that $\theta_y'$ satisfies $\{\theta_{G|y}'=\mt{\theta}_{\mt{G}|y}/|\mt{G}| \, \forall \colon G \in \mt{G}\}$.  But just because the shuffling changes class-conditional likelihoods does \emph{not} mean that Bayes risk must also change. This result follows immediately upon realizing that posteriors can change without classification performance changing.  The above results are easily extended to consider non-equal class priors and $c$-class classification problems.  To see this, ignoring ties, simply replace each minimum likelihood with a sum over all non-maximum posteriors: 
+.  Uniform shuffling has the effect of ``flattening'' likelihoods within isomorphism sets, from $\theta_y$ to $\theta_y'$, so that $\theta_y'$ satisfies $\{\theta_{G|y}'=\mt{\theta}_{\mt{G}|y}/|\mt{G}| \, \forall \colon G \in \mt{G}\}$.  But just because the shuffling changes class-conditional likelihoods does \emph{not} mean that Bayes risk must also change. This result follows immediately upon realizing that posteriors can change without classification performance changing.  The above results are easily extended to consider non-equal class priors and $c$-class classification problems.  To see this, ignoring ties, simply replace each minimum likelihood with a sum over all non-maximum posteriors: 
 % $$\min_y \PP_y(G) \to \sum_{y \in \mc{Y}'} \PP_y(G) \text{ where } \mc{Y}' =\{y : y \neq \argmax_y \PP_y\}.$$
 \begin{multline}
 \min_y \theta_{G|y} \pi_y \mapsto \sum_{y \in \mc{Y}'} \theta_{G|y} \pi_y \\ \text{ where } \mc{Y}' =\{y \colon y \neq \argmax_y \theta_{G|y} \pi_y\}.
@@ -306,7 +309,7 @@ The above result demonstrates that even when the labels \emph{do} carry some cla
 \subsection{Bayes Optimal Graph Invariant Classification After Shuffling} % (fold)
 \label{sec:gi}
 
-A graph invariant on $\mc{G}_n$ is any function $\psi$  such that $\psi(G)=\psi(\Qs(G))$ for all $G \in \mc{G}_n$ and $\Qs \in \mc{Q}_n$.  A graph invariant classifier is a composition of a classifier with an invariant function, $h^\psi=f^\psi \circ \psi$.  The Bayes optimal graph invariant classifier minimizes risk over all invariants: 
+A graph invariant on $\mc{G}_n$ is any function $\psi$  such that $\psi(G)=\psi(\Qs(G))$ for all $G \in \mc{G}_n$ and $\Qs \in \mc{Q}_n$ (note that an unlabeling function $U(G)$ is a special case of $\psi$).  A graph invariant classifier is a composition of a classifier with an invariant function, $h^\psi=f^\psi \circ \psi$.  The Bayes optimal graph invariant classifier minimizes risk over all invariants: 
 \begin{align} \label{eq:psi}
 	h_*^{\psi}=\argmin_{\psi \in \Psi, f^{\psi} \in \mc{F}^{\psi}} \EE[f(\psi(\GG))\neq Y],
 \end{align}
@@ -513,9 +516,9 @@ Thus, given shuffled data $\mc{T}_s'$, one could consider either $\mh{h}_s^{\del
 	% The above domination follows from the following consideration:  
 	Both $\mh{h}_s^{\delta}$ and $\mh{h}_s^{'\delta'}$ operate on $\mc{T}_s'$, that is, shuffled graph data.  Let $k$NN$_{\delta}(G')$ be the collection of $k_s$ nearest neighbors of $G'$ using $\delta$ as the distance metric.  Let $k$NN$_{\delta'}(G')$ be the same except using $\delta'$ as the distance metric.  Let $\{G_i\}_{\forall y_i=y_{G'}}$ indicate the set of training graphs with the same class label as the test graph, $G'$.  The above theorem follows from the following inequality:
 \begin{align}
-|k\text{NN}_{\delta}(G') \cap \{G_i\}_{\forall y_i=y_{G'}}| \leq |k\text{NN}_{\delta'}(G') \cap \{G_i\}_{\forall y_i=y_{G'}}|,
+|k\text{NN}_{\delta}(G') \cap \{G_i\}_{\forall y_i=y_{G'}}| \leq |k\text{NN}_{\delta'}(G') \cap \{G_i\}_{\forall y_i=y_{G'}}|.
 \end{align}
-	from which our result follows.
+Because $|k\text{NN}_{\delta}(G')|=|k\text{NN}_{\delta'}(G')|$, whenever the latter has a larger intersection with the correct graphs, it must have a correspondingly smaller intersection with the incorrect graphs, and thus $\mh{h}_s^{'\delta'}$ will correctly classify more often than $\mh{h}_s^{\delta}$.
 	  	% $\mh{h}_s^{\delta'}$ only benefits from graphs that have been shuffled identically, whereas $\mh{h}_s^{'\delta'}$  benefits from all graphs within an equivalence class, regardless of how they have been shuffled. Therefore, $\mh{h}^{\delta}_s$ is inadmissible with respect to $\mh{h}_s^{'\delta'}$ under the expected risk of $0-1$ loss. 
 \end{proof}
 % 	Moreover, if vertex label information is available, $\mh{h}^{\delta}_s$ is also inadmissible under $0-1$ loss.
@@ -592,7 +595,7 @@ We buttress the above theoretical results via numerical experiments.  Consider t
 	\item {$\psi$-$1$NN:} A $1$NN with Euclidean distance using the seven graph invariants described above.  Prior to computing the Euclidean distance, for each invariant, we rescale all the values to lie between zero and one.
 	\item {$\mh{\pi}$:} Use the chance classifier defined above.
 \end{itemize}
-Performance is assessed by misclassification rate.
+Performance is assessed by leave-one-out misclassification rate.
 
 
 % \subsection{Practical Shuffled Graph Classification} % (fold)
@@ -731,20 +734,20 @@ Because graph-matching is $\mc{NP}$-hard, we instead use an approximate graph-ma
 \bibliography{/Users/jovo/Research/latex/library}
 \bibliographystyle{IEEEtran}
 
-\begin{IEEEbiography}{Joshua T. Vogelstein}
- is a spritely young man, engorphed in a novel post-buddhist metaphor.
-
-\end{IEEEbiography}
-
-
-% insert where needed to balance the two columns on the last page with
-% biographies
-%\newpage
-
-
-\begin{IEEEbiography}{Carey E. Priebe}
-Buddha in training.
-\end{IEEEbiography}
+% \begin{IEEEbiography}{Joshua T. Vogelstein}
+%  is a spritely young man, engorphed in a novel post-buddhist metaphor.
+% 
+% \end{IEEEbiography}
+% 
+% 
+% % insert where needed to balance the two columns on the last page with
+% % biographies
+% %\newpage
+% 
+% 
+% \begin{IEEEbiography}{Carey E. Priebe}
+% Buddha in training.
+% \end{IEEEbiography}
 
 % Can be used to pull up biographies so that the bottom of the last one
 % is flush with the other column.
